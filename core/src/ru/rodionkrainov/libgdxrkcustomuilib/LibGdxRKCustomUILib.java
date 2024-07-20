@@ -1,3 +1,14 @@
+/**
+*
+* Author: Krainov Rodion V. (Chance area) <chancearea@gmail.com>
+* Develop started: 19.07.2024
+* Description: Cross-platform library for fast and convenient work with GUI based on the LibGDX framework.
+*              Designed specifically for the "Servo-motions Control Panel" (https://github.com/chance-area/servo-motions-control-panel)
+*              program to simplify the process of its development and debugging.
+* License: MIT
+*
+ **/
+
 package ru.rodionkrainov.libgdxrkcustomuilib;
 
 import com.badlogic.gdx.Gdx;
@@ -6,7 +17,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -23,9 +33,11 @@ import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKLabel;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKRect;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKTabPanelsManager;
-import ru.rodionkrainov.libgdxrkcustomuilib.utils.DrawingTools;
 
 public class LibGdxRKCustomUILib extends Actor {
+    public static final String LIB_NAME    = "LibGdxRKCustomUILib";
+    public static final String LIB_VERSION = "0.4";
+
     private final boolean IS_DESKTOP;
     private final JFrame JFRAME;
 
@@ -49,13 +61,13 @@ public class LibGdxRKCustomUILib extends Actor {
     private final ArrayList<RKRect>             arrRKRects             = new ArrayList<>();
     private final ArrayList<RKTabPanelsManager> arrRKTabPanelsManagers = new ArrayList<>();
 
-    public LibGdxRKCustomUILib(String _fontFilePath, float _windowWidth, float _windowHeight, boolean _isDesktop, OrthographicCamera _ortCamera, JFrame _jframe) {
+    public LibGdxRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, float _windowWidth, float _windowHeight, boolean _isDesktop, OrthographicCamera _ortCamera, JFrame _jframe) {
         super();
 
         windowWidth  = _windowWidth;
         windowHeight = _windowHeight;
 
-        GlobalFontsManager.loadAndInit(_fontFilePath);
+        GlobalFontsManager.loadAndInit(_fontFilePath, _fontBorderWidth, _fontSpaceX);
 
         IS_DESKTOP = _isDesktop;
         JFRAME     = _jframe;

@@ -38,7 +38,7 @@ public class RKTabPanelsManager implements IRKUIElement {
     private final int LABEL_FONT_SIZE;
     private final float SPACE_BETWEEN_TABS     = 0.75f;
     private final float TABS_TITLES_PADDING_LR = 22f; // Left and Right
-    private final float TABS_TITLES_PADDING_UB = 7f; // Up and Bottom
+    private final float TABS_TITLES_PADDING_UB = 8f; // Up and Bottom
     private final float LINE_HEIGHT            = 1.5f;
 
     private String selectedTabName = "";

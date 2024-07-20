@@ -31,30 +31,12 @@ public class RKLabel implements IRKUIElement {
         fillColor = _color.cpy();
         borderColor = new Color(0, 0, 0, alpha);
 
-        float realFontSize;
         LabelStyle labelStyle = new LabelStyle();
-
-        if (_fontSize <= 10)      {
-            labelStyle.font = GlobalFontsManager.BP_FONT_FROM_5_TO_10;
-            realFontSize = 15;
-        } else if (_fontSize <= 18) {
-            labelStyle.font = GlobalFontsManager.BP_FONT_FROM_11_TO_18;
-            realFontSize = 29;
-        } else if (_fontSize <= 30) {
-            labelStyle.font = GlobalFontsManager.BP_FONT_FROM_19_TO_30;
-            realFontSize = 49;
-        } else if (_fontSize <= 44) {
-            labelStyle.font = GlobalFontsManager.BP_FONT_FROM_31_TO_44;
-            realFontSize = 75;
-        } else {
-            labelStyle.font = GlobalFontsManager.BP_FONT_FROM_45_TO_60;
-            realFontSize = 105;
-        }
+        labelStyle.font = GlobalFontsManager.ARR_BP_FONTS_10_TO_50[ (Math.max(0, Math.min((_fontSize - 10), 40))) ];
 
         label = new Label(_text, labelStyle);
         label.setColor(fillColor);
         label.setPosition(_posX, _posY);
-        label.setFontScale(Math.round((_fontSize / realFontSize) * 1000) / 1000f);
         label.setAlignment(Align.left);
         label.pack();
     }
