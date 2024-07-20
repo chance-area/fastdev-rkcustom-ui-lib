@@ -227,22 +227,22 @@ public class LibGdxRKCustomUILib extends Actor {
     }
 
     // ---- Tabs ----
-    public void addTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, int _zIndex) {
-        RKTabPanelsManager rkTabPanelsManager = new RKTabPanelsManager(_name, _posX, _posY, _labelFontSize, _panelsBgColor, _zIndex, 0, this);
+    public void addTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex) {
+        RKTabPanelsManager rkTabPanelsManager = new RKTabPanelsManager(_name, _posX, _posY, _labelFontSize, _panelsBgColor, _panelsBorderColor, _borderSize, _zIndex, 0, this);
 
         arrRKTabPanelsManagers.add(rkTabPanelsManager);
         addElement(rkTabPanelsManager);
     }
     public void addTabPanelsManager(String _name, int _labelFontSize, Color _panelsBgColor, int _zIndex) {
-        addTabPanelsManager(_name, 0f, 0f, _labelFontSize, _panelsBgColor, _zIndex);
+        addTabPanelsManager(_name, 0f, 0f, _labelFontSize, _panelsBgColor, null, -1, _zIndex);
     }
     public void addTabPanelsManager(String _name, int _labelFontSize, Color _panelsBgColor) {
-        addTabPanelsManager(_name, 0f, 0f, _labelFontSize, _panelsBgColor, 0);
+        addTabPanelsManager(_name, 0f, 0f, _labelFontSize, _panelsBgColor, null, -1, 0);
     }
 
 
     /* -------------------------------------------------------------------------------------
-    --------------------------------- 'ELEMENTS' METHODS ---------------------------------
+    --------------------------------- 'ELEMENTS' METHODS -----------------------------------
     ---------------------------------------------------------------------------------------- */
 
     private IRKUIElement foundAndGetElement(String _name) {

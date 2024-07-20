@@ -23,6 +23,8 @@ public class RKTabPanelsManager implements IRKUIElement {
 
     private Color fillColor;
     private Color borderColor;
+    private float borderSize;
+
     private float alpha      = 1f;
     private float localAlpha = 1f;
 
@@ -43,12 +45,14 @@ public class RKTabPanelsManager implements IRKUIElement {
     private boolean isSelectedTabChanged = false;
     private final ArrayList<ArrayList<String>> arrTabs = new ArrayList<>();
 
-    public RKTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
+    public RKTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
 
-        fillColor = _panelsBgColor;
+        fillColor   = (_panelsBgColor != null ? _panelsBgColor.cpy() : null);
+        borderColor = (_panelsBorderColor != null ? _panelsBorderColor.cpy() : null);
+        borderSize  = _borderSize;
 
         LABEL_FONT_SIZE = _labelFontSize;
         LIB             = _lib;
@@ -106,6 +110,9 @@ public class RKTabPanelsManager implements IRKUIElement {
     @Override
     public void update(float _delta) {
         if (isVisible && alpha > 0 && localAlpha > 0) {
+            fillColor.a = Math.min(alpha, localAlpha);
+            if (borderColor != null) borderColor.a = Math.min(alpha, localAlpha);
+
             float sumW = 0;
             for (int i = 0; i < arrTabs.size(); i++) {
                 String labelName = arrTabs.get(i).get(0);
@@ -256,12 +263,12 @@ public class RKTabPanelsManager implements IRKUIElement {
 
     @Override
     public void setFillColor(Color _color) {
-        fillColor = _color;
+        fillColor = _color.cpy();
     }
 
     @Override
     public void setBorderColor(Color _color) {
-        borderColor = _color;
+        borderColor = _color.cpy();
     }
 
     @Override

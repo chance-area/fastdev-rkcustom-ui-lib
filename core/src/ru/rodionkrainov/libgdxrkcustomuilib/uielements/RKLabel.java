@@ -28,7 +28,7 @@ public class RKLabel implements IRKUIElement {
         zIndex = _zIndex;
         localZIndex = _localZIndex;
 
-        fillColor = _color;
+        fillColor = _color.cpy();
         borderColor = new Color(0, 0, 0, alpha);
 
         float realFontSize;
@@ -137,12 +137,14 @@ public class RKLabel implements IRKUIElement {
 
     @Override
     public void setFillColor(Color _color) {
-        fillColor = _color;
+        fillColor = _color.cpy();
+        fillColor.a = Math.min(alpha, localAlpha);
     }
 
     @Override
     public void setBorderColor(Color _color) {
-        borderColor = _color;
+        borderColor = _color.cpy();
+        borderColor.a = Math.min(alpha, localAlpha);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -36,8 +37,8 @@ public class RKRect implements IRKUIElement {
         zIndex = _zIndex;
         localZIndex = _localZIndex;
 
-        fillColor   = _fillColor;
-        borderColor = _borderColor;
+        fillColor   = _fillColor.cpy();
+        borderColor = (_borderColor != null ? _borderColor.cpy() : null);
         borderSize  = _borderSize;
 
         roundRadius              = _roundRadius;
@@ -179,12 +180,14 @@ public class RKRect implements IRKUIElement {
 
     @Override
     public void setFillColor(Color _color) {
-        fillColor = _color;
+        fillColor = _color.cpy();
+        fillColor.a = Math.min(alpha, localAlpha);
     }
 
     @Override
     public void setBorderColor(Color _color) {
-        borderColor = _color;
+        borderColor = _color.cpy();
+        borderColor.a = Math.min(alpha, localAlpha);
     }
 
     @Override

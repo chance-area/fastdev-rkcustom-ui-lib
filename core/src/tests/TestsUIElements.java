@@ -115,7 +115,7 @@ public class TestsUIElements extends ApplicationAdapter {
         rkCustomUILib.getTabPanelsManager("tabPanelsManager_example2").attachElementsToTabPanel("example_two", new String[]{"label_example_2"});
 
         //rkCustomUILib.setVisible("label_example_1", false);
-        //rkCustomUILib.setAlpha("tabPanelsManager_example2", 0.4f);
+        //rkCustomUILib.setAlpha("tabPanelsManager_example2", 0.5f);
 
         stage.addActor(rkCustomUILib);
     }
