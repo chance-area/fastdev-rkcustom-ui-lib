@@ -63,7 +63,7 @@ public class RKTabPanelsManager implements IRKUIElement {
         shapeRenderer = new ShapeRenderer();
     }
 
-    public void addTab(String _tabName, String _tabTitle) {
+    public void addTab(String _tabName, String _tabTitle, int _tabRectAlign) {
         String labelName = "tabManager_" + name + "_tab_" + "-" + _tabName + "_tabLabel_" + arrTabs.size();
         String rectName  = "tabManager_" + name + "_tab_" + "-" + _tabName + "_tabRect_" + arrTabs.size();
 
@@ -73,10 +73,13 @@ public class RKTabPanelsManager implements IRKUIElement {
         LIB.setVisible(labelName, isVisible);
         LIB.setVisible(rectName, isVisible);
 
-        arrTabs.add(new ArrayList<>(Arrays.asList(labelName, rectName, _tabName, _tabTitle)));
+        arrTabs.add(new ArrayList<>(Arrays.asList(labelName, rectName, _tabName, _tabTitle, (_tabRectAlign == 1 ? "right" : "left"))));
 
         tabHeight = LIB.getSize(labelName).y + TABS_TITLES_PADDING_UB * 2 + LINE_HEIGHT;
         if (selectedTabName.isEmpty()) selectedTabName = _tabName;
+    }
+    public void addTab(String _tabName, String _tabTitle) {
+        addTab(_tabName, _tabTitle, 0);
     }
 
     public void attachElementsToTabPanel(String _tabNameToAttach, String[] _attachElementsNames) {
@@ -113,7 +116,7 @@ public class RKTabPanelsManager implements IRKUIElement {
             fillColor.a = Math.min(alpha, localAlpha);
             if (borderColor != null) borderColor.a = Math.min(alpha, localAlpha);
 
-            float sumW = 0;
+            float sumWidthLeft = 0f, sumWidthRight = 0f;
             for (int i = 0; i < arrTabs.size(); i++) {
                 String labelName = arrTabs.get(i).get(0);
                 String rectName  = arrTabs.get(i).get(1);
@@ -121,13 +124,16 @@ public class RKTabPanelsManager implements IRKUIElement {
                 LIB.setZIndex(labelName, zIndex);
                 LIB.setZIndex(rectName, zIndex);
 
-                float tabWidth = LIB.getSize(labelName).x + TABS_TITLES_PADDING_LR * 2;
+                float tabRectWidth = LIB.getSize(labelName).x + TABS_TITLES_PADDING_LR * 2;
+                float tabRectX     = getPosition().x + (arrTabs.get(i).get(4).equals("left") ? (i > 0 ? (SPACE_BETWEEN_TABS + sumWidthLeft) : 0) : (getSize().x - tabRectWidth) - (i > 0 ? (SPACE_BETWEEN_TABS + sumWidthRight) : 0));
+                float tabRectY     = getPosition().y + getHeight() + LINE_HEIGHT;
 
-                LIB.setPosition(labelName, getPosition().x + (i > 0 ? (SPACE_BETWEEN_TABS + sumW) : 0) + (tabWidth - LIB.getSize(labelName).x) / 2f, getPosition().y + getHeight() + ((tabHeight + LINE_HEIGHT * 1.5f) - LIB.getSize(labelName).y) / 2f);
-                LIB.setPosition(rectName, getPosition().x + (i > 0 ? (SPACE_BETWEEN_TABS + sumW) : 0), getPosition().y + getHeight() + LINE_HEIGHT);
-                LIB.setSize(rectName, tabWidth, tabHeight - LINE_HEIGHT);
+                LIB.setPosition(rectName, tabRectX, tabRectY);
+                LIB.setSize(rectName, tabRectWidth, tabHeight - LINE_HEIGHT);
+                LIB.setPosition(labelName, tabRectX + (tabRectWidth - LIB.getSize(labelName).x) / 2f, tabRectY + (tabHeight - LINE_HEIGHT - LIB.getSize(labelName).y) / 2f);
 
-                sumW += tabWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
+                if (arrTabs.get(i).get(4).equals("left")) sumWidthLeft += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
+                else sumWidthRight += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
 
                 // hover event
                 if (LIB.isPointerHover(labelName) || LIB.isPointerHover(rectName)) {
@@ -143,10 +149,10 @@ public class RKTabPanelsManager implements IRKUIElement {
             // tabs content (attached elements) - change visible on select tab
             if (isSelectedTabChanged) {
                 for (int i = 0; i < arrTabs.size(); i++) {
-                    if (arrTabs.get(i).size() > 4) {
+                    if (arrTabs.get(i).size() > 5) {
                         boolean isElementsVisible = arrTabs.get(i).get(2).equals(selectedTabName);
 
-                        for (int j = 4; j < arrTabs.get(i).size(); j++) {
+                        for (int j = 5; j < arrTabs.get(i).size(); j++) {
                             String element = arrTabs.get(i).get(j);
                             LIB.setLocalAlpha(element, (isElementsVisible ? LIB.getAlpha(element) : 0f));
                         }
@@ -203,8 +209,8 @@ public class RKTabPanelsManager implements IRKUIElement {
             LIB.setVisible(arrTabs.get(i).get(0), _isVisible);
             LIB.setVisible(arrTabs.get(i).get(1), _isVisible);
 
-            if (arrTabs.get(i).size() > 4) {
-                for (int j = 4; j < arrTabs.get(i).size(); j++) {
+            if (arrTabs.get(i).size() > 5) {
+                for (int j = 5; j < arrTabs.get(i).size(); j++) {
                     LIB.setVisible(arrTabs.get(i).get(j), _isVisible);
                 }
             }
@@ -279,8 +285,8 @@ public class RKTabPanelsManager implements IRKUIElement {
             LIB.setAlpha(arrTabs.get(i).get(0), alpha);
             LIB.setAlpha(arrTabs.get(i).get(1), alpha);
 
-            if (arrTabs.get(i).size() > 4) {
-                for (int j = 4; j < arrTabs.get(i).size(); j++) {
+            if (arrTabs.get(i).size() > 5) {
+                for (int j = 5; j < arrTabs.get(i).size(); j++) {
                     LIB.setAlpha(arrTabs.get(i).get(j), alpha);
                 }
             }
@@ -296,8 +302,8 @@ public class RKTabPanelsManager implements IRKUIElement {
             LIB.setLocalAlpha(arrTabs.get(i).get(0), localAlpha);
             LIB.setLocalAlpha(arrTabs.get(i).get(1), localAlpha);
 
-            if (arrTabs.get(i).size() > 4) {
-                for (int j = 4; j < arrTabs.get(i).size(); j++) {
+            if (arrTabs.get(i).size() > 5) {
+                for (int j = 5; j < arrTabs.get(i).size(); j++) {
                     LIB.setLocalAlpha(arrTabs.get(i).get(j), localAlpha);
                 }
             }

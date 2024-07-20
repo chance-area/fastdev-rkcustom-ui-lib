@@ -2,7 +2,7 @@ package ru.rodionkrainov.libgdxrkcustomuilib;
 
 import com.badlogic.gdx.graphics.Color;
 
-public class GlobalColorsDark {
+public abstract class GlobalColorsDark {
     public static final Color DARK_COLOR_BG = new Color(22f / 255f, 23f / 255f, 27f / 255f, 1f);
 
     public static final Color DARK_COLOR_TABS              = new Color(29f / 255f, 30f / 255f, 33f / 255f, 1f);

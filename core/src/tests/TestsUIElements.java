@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -40,6 +39,7 @@ public class TestsUIElements extends ApplicationAdapter {
     private Stage                  stage;
     public static InputMultiplexer inputMultiplexer;
 
+    private boolean isUIElementsInit = false;
     private LibGdxRKCustomUILib rkCustomUILib = null;
 
     /* ------------------- Elements names (constants) ------------------- */
@@ -85,41 +85,47 @@ public class TestsUIElements extends ApplicationAdapter {
         Gdx.input.setInputProcessor(inputMultiplexer);
         Gdx.input.setCatchKey(Input.Keys.BACK, true);
 
-        initUIElements();
+        // ------------ ### Init lib ### ------------
+        // format: {'name', 'path to file'}
+        String[][] imagesNamesPath = new String[][] {
+                {"settings_icon", "settings_512x512.png"},
+                {"info_icon", "info_512x512.png"},
+                {"help_icon", "help_512x512.png"}
+        };
+        rkCustomUILib = new LibGdxRKCustomUILib("fonts/ubuntu/ubuntu-regular.ttf", 0f, 2, "png", imagesNamesPath, false, windowWidth, windowHeight, isDesktop, superDuperJFrame);
+
+        // ---------------- ### Add to stage ### ------------------
+        stage.addActor(rkCustomUILib);
     }
 
     private void initUIElements() {
-        rkCustomUILib = new LibGdxRKCustomUILib("fonts/bitter/bitter-medium.ttf", 0f, 2, windowWidth, windowHeight, isDesktop, ortCamera, superDuperJFrame);
-
-        rkCustomUILib.addLabel(nameLabelFPS, "FPS: --", GlobalColorsDark.DARK_COLOR_WHITE, (isDesktop ? 12 : 16), 999);
+        rkCustomUILib.addLabel(nameLabelFPS, "FPS: --", GlobalColorsDark.DARK_COLOR_WHITE, (isDesktop ? 14 : 18), 999);
         //rkCustomUILib.setZIndex(nameLabelFPS, 999);
 
-        rkCustomUILib.addLabel("label_example_1", "Пример текста («первый»)", GlobalColorsDark.DARK_COLOR_WHITE, (isDesktop ? 20 : 22), 3);
-        rkCustomUILib.addLabel("label_example_2", "Пример текста («второй»)", GlobalColorsDark.DARK_COLOR_WHITE, (isDesktop ? 20 : 22), 3);
+        rkCustomUILib.addLabel("label_example_1", "Пример текста («первый»)", GlobalColorsDark.DARK_COLOR_RED, (isDesktop ? 20 : 22), 3);
+        rkCustomUILib.addLabel("label_example_2", "Пример текста («второй»)", GlobalColorsDark.DARK_COLOR_GREEN, (isDesktop ? 20 : 22), 3);
 
-        rkCustomUILib.addTabPanelsManager(nameTabManagerExample_1, (isDesktop ? 30 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_1, 1);
-        rkCustomUILib.addTabPanelsManager(nameTabManagerExample_2, (isDesktop ? 30 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_2, 2);
+        rkCustomUILib.addTabPanelsManager(nameTabManagerExample_1, (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_1, 1);
+        rkCustomUILib.addTabPanelsManager(nameTabManagerExample_2, (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_2, 2);
 
         // tab panel 1 (main)
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_1).addTab("base_elements", "Базовые элементы");
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_1).addTab("3d_elements", "3D среда");
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_1).addTab("graphs_elements", "Графики");
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_1).addTab("base_elements", "Базовые элементы");
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_1).addTab("3d_elements", "3D среда");
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_1).addTab("graphs_elements", "Графики");
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_1).addTab("settings_elements", "%#img_settings_icon#%", 1);
 
         // tab panel 2 (mini, attach to main)
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_2).addTab("example_one", "Пример 1");
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_2).addTab("example_two", "Пример 2");
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_2).addTab("example_one", "Пример 1");
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_2).addTab("example_two", "Пример 2");
 
         // attach elements to main tabPanelsManager (1)
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_1).attachElementsToTabPanel("base_elements", new String[]{nameTabManagerExample_2});
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_1).attachElementsToTabPanel("base_elements", new String[]{nameTabManagerExample_2});
 
         // attach elements to mini tabPanelsManager (2)
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_2).attachElementsToTabPanel("example_one", new String[]{"label_example_1"});
-        rkCustomUILib.getTabPanelsManager(nameTabManagerExample_2).attachElementsToTabPanel("example_two", new String[]{"label_example_2"});
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_2).attachElementsToTabPanel("example_one", new String[]{"label_example_1"});
+        rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_2).attachElementsToTabPanel("example_two", new String[]{"label_example_2"});
 
-        //rkCustomUILib.setVisible("label_example_1", false);
-        //rkCustomUILib.setAlpha("tabPanelsManager_example2", 0.5f);
-
-        stage.addActor(rkCustomUILib);
+        isUIElementsInit = true;
     }
 
     @Override
@@ -140,22 +146,35 @@ public class TestsUIElements extends ApplicationAdapter {
     private void update(float _deltaTime) {
         stage.act(_deltaTime);
 
-        // FPS
-        rkCustomUILib.setLabelText(nameLabelFPS, "FPS: " + Gdx.app.getGraphics().getFramesPerSecond());
-        rkCustomUILib.setPosition(nameLabelFPS, (windowWidth - rkCustomUILib.getSize(nameLabelFPS).x) - (isDesktop ? 12 : 30), (isDesktop) ? (34 - rkCustomUILib.getSize(nameLabelFPS).y) / 2f : ((36 - rkCustomUILib.getSize(nameLabelFPS).y) / 2f) + 0.7f);
+        if (rkCustomUILib != null) {
+            if (rkCustomUILib.isAllResLoaded()) {
+                if (!isUIElementsInit) {
+                    initUIElements();
+                    rkCustomUILib.hideLoadingLine();
+                }
 
-        // Example
-        rkCustomUILib.setPosition("label_example_1", (windowWidth - rkCustomUILib.getSize("label_example_1").x) / 2f + 100, 200);
-        rkCustomUILib.setPosition("label_example_2", (windowWidth - rkCustomUILib.getSize("label_example_2").x) / 2f + 100, 300);
-        rkCustomUILib.setSize(nameTabManagerExample_1, windowWidth, windowHeight - rkCustomUILib.getTabPanelsManager(nameTabManagerExample_1).getTabHeight());
-        rkCustomUILib.setPosition(nameTabManagerExample_1, 0, 0);
+                // FPS
+                rkCustomUILib.setLabelText(nameLabelFPS, "FPS: " + Gdx.app.getGraphics().getFramesPerSecond());
+                rkCustomUILib.setPosition(nameLabelFPS, (windowWidth - rkCustomUILib.getSize(nameLabelFPS).x) - (isDesktop ? 12 : 30), (isDesktop) ? (34 - rkCustomUILib.getSize(nameLabelFPS).y) / 2f : ((36 - rkCustomUILib.getSize(nameLabelFPS).y) / 2f) + 0.7f);
 
-        rkCustomUILib.setSize(nameTabManagerExample_2, (isDesktop ? 500 : 600), 420);
-        rkCustomUILib.setPosition(nameTabManagerExample_2, windowWidth * 0.45f, windowHeight * 0.13f);
+                // Example
+                rkCustomUILib.setPosition("label_example_1", (windowWidth - rkCustomUILib.getSize("label_example_1").x) / 2f + 100, 200);
+                rkCustomUILib.setPosition("label_example_2", (windowWidth - rkCustomUILib.getSize("label_example_2").x) / 2f + 100, 300);
+                rkCustomUILib.setSize(nameTabManagerExample_1, windowWidth, windowHeight - rkCustomUILib.getRKTabPanelsManager(nameTabManagerExample_1).getTabHeight());
+                rkCustomUILib.setPosition(nameTabManagerExample_1, 0, 0);
+
+                rkCustomUILib.setSize(nameTabManagerExample_2, (isDesktop ? 500 : 600), 420);
+                rkCustomUILib.setPosition(nameTabManagerExample_2, windowWidth * 0.45f, windowHeight * 0.13f);
+            }
+        }
     }
 
     private void renderFrame() {
         stage.draw();
+
+        if (rkCustomUILib != null && rkCustomUILib.isAllResLoaded()) {
+            // TODO
+        }
     }
 
     @Override

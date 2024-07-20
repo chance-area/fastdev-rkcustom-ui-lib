@@ -1,5 +1,6 @@
 package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
 
 import ru.rodionkrainov.libgdxrkcustomuilib.GlobalFontsManager;
+import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
 
 public class RKLabel implements IRKUIElement {
     private String name;
@@ -16,20 +18,29 @@ public class RKLabel implements IRKUIElement {
     private final int localZIndex;
     private boolean isPointerHover = false;
 
+    private final LibGdxRKCustomUILib LIB;
+
     private Color fillColor;
     private Color borderColor;
     private float alpha      = 1f;
     private float localAlpha = 1f;
 
+    private boolean isImage = false;
+
+    private int fontSize;
     private final Label label;
 
-    public RKLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
+    public RKLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
 
-        fillColor = _color.cpy();
+        LIB = _lib;
+
+        fillColor   = _color.cpy();
         borderColor = new Color(0, 0, 0, alpha);
+
+        fontSize = _fontSize;
 
         LabelStyle labelStyle = new LabelStyle();
         labelStyle.font = GlobalFontsManager.ARR_BP_FONTS_10_TO_50[ (Math.max(0, Math.min((_fontSize - 10), 40))) ];
@@ -54,7 +65,19 @@ public class RKLabel implements IRKUIElement {
 
     @Override
     public void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha) {
-        if (alpha > 0 && localAlpha > 0) label.draw(_batch, _parentAlpha);
+        if (alpha > 0 && localAlpha > 0) {
+            String text = getText();
+            if (text.contains("%#img_") && text.contains("#%")) {
+                String imgName = text.substring(text.indexOf("%#img_") + 6, text.indexOf("#%"));
+
+                isImage = true;
+                setSize(fontSize * 1.3f, fontSize * 1.3f);
+                //_batch.setColor(fillColor.r, fillColor.g, fillColor.b, fillColor.a);
+                _batch.draw(LIB.getImageTexture(imgName), label.getX() - (fontSize * 1.3f - label.getWidth()) / 2f, label.getY() - (fontSize * 1.3f - label.getHeight()) / 2f, fontSize * 1.3f, fontSize * 1.3f);
+            } else {
+                label.draw(_batch, _parentAlpha);
+            }
+        }
     }
 
     @Override
@@ -170,7 +193,7 @@ public class RKLabel implements IRKUIElement {
 
     @Override
     public Vector2 getSize() {
-        label.pack();
+        if (!isImage) label.pack();
         return (new Vector2(label.getWidth(), label.getHeight()));
     }
 
