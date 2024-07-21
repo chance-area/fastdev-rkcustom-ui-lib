@@ -24,6 +24,7 @@ import javax.swing.JFrame;
 import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IButtonClickEvent;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKButton;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKTabPanelsManager;
 
@@ -110,25 +111,18 @@ public class TestsUIElements extends ApplicationAdapter {
         rkCustomUILib.addLabel(nameLabelFPS, "FPS: --", GlobalColorsDark.DARK_COLOR_WHITE, (isDesktop ? 14 : 18), 999);
         //rkCustomUILib.setZIndex(nameLabelFPS, 999);
 
+        // add base elements
         rkCustomUILib.addLabel(nameLabelExampleOne, "Пример текста («первый»)", GlobalColorsDark.DARK_COLOR_RED, (isDesktop ? 20 : 22), 3);
         rkCustomUILib.addLabel(nameLabelExampleTwo, "Пример текста («второй»)", GlobalColorsDark.DARK_COLOR_GREEN, (isDesktop ? 20 : 22), 3);
-        buttonOne = rkCustomUILib.addButton("simple_button_1", "Кнопка 1", GlobalColorsDark.DARK_COLOR_WHITE, 20, 100, 100, 120, 45, GlobalColorsDark.DARK_COLOR_BUTTON, GlobalColorsDark.DARK_COLOR_BUTTON_BORDER, 2, 10f, new IButtonClickEvent() {
-            @Override
-            public void onButtonClick() {
-                Gdx.app.log("BUTTON_CLICK", "but_1");
-            }
-        }, 4);
-        buttonTwo = rkCustomUILib.addButton("simple_button_2", "Кнопка 2", GlobalColorsDark.DARK_COLOR_WHITE, 20, 80, 120, 120, 45, GlobalColorsDark.DARK_COLOR_BUTTON, GlobalColorsDark.DARK_COLOR_BUTTON_BORDER, 2, 10f, new IButtonClickEvent() {
-            @Override
-            public void onButtonClick() {
-                Gdx.app.log("BUTTON_CLICK", "but_2");
-            }
-        }, 3);
+
+        buttonOne = rkCustomUILib.addButton("simple_button_1", "Кнопка 1", GlobalColorsDark.DARK_COLOR_WHITE, 20, 100, 100, 120, 45, GlobalColorsDark.DARK_COLOR_BUTTON, GlobalColorsDark.DARK_COLOR_BUTTON_BORDER, 2, 10f, () -> Gdx.app.log("BUTTON_CLICK", "but_1"), 4);
+        buttonTwo = rkCustomUILib.addButton("simple_button_2", "Кнопка 2", GlobalColorsDark.DARK_COLOR_WHITE, 20, 80, 120, 120, 45, GlobalColorsDark.DARK_COLOR_BUTTON, GlobalColorsDark.DARK_COLOR_BUTTON_BORDER, 2, 10f, () -> Gdx.app.log("BUTTON_CLICK", "but_2"), 3);
         buttonOne.setAlpha(0.7f);
         buttonTwo.setAlpha(1f);
 
+        // init and add tab panels managers
         tabPanelsManagerOne = rkCustomUILib.addTabPanelsManager("tab_panels_manager_1", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_1, 1);
-        tabPanelsManagerTwo = rkCustomUILib.addTabPanelsManager("tab_panels_manager_1", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_2, 2);
+        tabPanelsManagerTwo = rkCustomUILib.addTabPanelsManager("tab_panels_manager_2", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_2, 2);
 
         // tab panel 1 (main)
         tabPanelsManagerOne.addTab("base_elements", "Базовые элементы");
@@ -141,7 +135,7 @@ public class TestsUIElements extends ApplicationAdapter {
         tabPanelsManagerTwo.addTab("example_two", "Пример 2");
 
         // attach elements to main tabPanelsManager (1)
-        tabPanelsManagerTwo.attachElementsToTabPanel("base_elements", new String[]{tabPanelsManagerTwo.getName()});
+        tabPanelsManagerOne.attachElementsToTabPanel("base_elements", new IRKUIElement[]{tabPanelsManagerTwo, buttonOne, buttonTwo});
 
         // attach elements to mini tabPanelsManager (2)
         tabPanelsManagerTwo.attachElementsToTabPanel("example_one", new String[]{nameLabelExampleOne});

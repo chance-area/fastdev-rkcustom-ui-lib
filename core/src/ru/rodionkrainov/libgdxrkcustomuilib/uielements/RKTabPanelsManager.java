@@ -100,6 +100,12 @@ public class RKTabPanelsManager implements IRKUIElement {
             }
         }
     }
+    public void attachElementsToTabPanel(String _tabNameToAttach, IRKUIElement[] _attachElements) {
+        String[] elementsNames = new String[ _attachElements.length ];
+        for (int i = 0; i < elementsNames.length; i++) elementsNames[i] = _attachElements[i].getName();
+
+        attachElementsToTabPanel(_tabNameToAttach, elementsNames);
+    }
 
     public void setSelectedTab(String _tabName) {
         previousSelectedTabName = selectedTabName;
