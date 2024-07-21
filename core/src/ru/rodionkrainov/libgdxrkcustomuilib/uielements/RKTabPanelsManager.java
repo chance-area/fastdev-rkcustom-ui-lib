@@ -1,6 +1,5 @@
 package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -40,8 +39,14 @@ public class RKTabPanelsManager implements IRKUIElement {
     private final float TABS_TITLES_PADDING_LR = 22f; // Left and Right
     private final float TABS_TITLES_PADDING_UB = 8f; // Up and Bottom
     private final float LINE_HEIGHT            = 1.5f;
+    private final float LINE_HEIGHT_KOF        = 3f; // for selected tab
+
+    // for animations
+    private float lineHeight_animationY = 0f;
 
     private String selectedTabName = "";
+    private String previousSelectedTabName = "";
+    private boolean isSelectTabClick     = false; // for line animation
     private boolean isSelectedTabChanged = false;
     private final ArrayList<ArrayList<String>> arrTabs = new ArrayList<>();
 
@@ -76,7 +81,10 @@ public class RKTabPanelsManager implements IRKUIElement {
         arrTabs.add(new ArrayList<>(Arrays.asList(labelName, rectName, _tabName, _tabTitle, (_tabRectAlign == 1 ? "right" : "left"))));
 
         tabHeight = LIB.getSize(labelName).y + TABS_TITLES_PADDING_UB * 2 + LINE_HEIGHT;
-        if (selectedTabName.isEmpty()) selectedTabName = _tabName;
+        if (selectedTabName.isEmpty()) {
+            selectedTabName         = _tabName;
+            previousSelectedTabName = _tabName;
+        }
     }
     public void addTab(String _tabName, String _tabTitle) {
         addTab(_tabName, _tabTitle, 0);
@@ -94,6 +102,8 @@ public class RKTabPanelsManager implements IRKUIElement {
     }
 
     public void setSelectedTab(String _tabName) {
+        previousSelectedTabName = selectedTabName;
+
         selectedTabName = _tabName;
         isSelectedTabChanged = true;
     }
@@ -111,7 +121,7 @@ public class RKTabPanelsManager implements IRKUIElement {
     }
 
     @Override
-    public void update(float _delta) {
+    public void update(float _delta, boolean[][] _pointersStates) {
         if (isVisible && alpha > 0 && localAlpha > 0) {
             fillColor.a = Math.min(alpha, localAlpha);
             if (borderColor != null) borderColor.a = Math.min(alpha, localAlpha);
@@ -135,12 +145,15 @@ public class RKTabPanelsManager implements IRKUIElement {
                 if (arrTabs.get(i).get(4).equals("left")) sumWidthLeft += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
                 else sumWidthRight += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
 
-                // hover event
+                // hover and click events
                 if (LIB.isPointerHover(labelName) || LIB.isPointerHover(rectName)) {
                     LIB.changeCursor(Cursor.HAND_CURSOR);
                     LIB.setFillColor(rectName, GlobalColorsDark.DARK_COLOR_TAB_HOVER);
 
-                    if (Gdx.input.justTouched()) setSelectedTab(arrTabs.get(i).get(2));
+                    if (_pointersStates[0][1]) {
+                        setSelectedTab(arrTabs.get(i).get(2));
+                        isSelectTabClick = true;
+                    }
                 } else {
                     LIB.setFillColor(rectName, GlobalColorsDark.DARK_COLOR_TABS);
                 }
@@ -148,6 +161,12 @@ public class RKTabPanelsManager implements IRKUIElement {
 
             // tabs content (attached elements) - change visible on select tab
             if (isSelectedTabChanged) {
+                // for line animation
+                if (isSelectTabClick && !previousSelectedTabName.equals(selectedTabName)) {
+                    lineHeight_animationY = LINE_HEIGHT * LINE_HEIGHT_KOF;
+                    isSelectTabClick = false;
+                }
+
                 for (int i = 0; i < arrTabs.size(); i++) {
                     if (arrTabs.get(i).size() > 5) {
                         boolean isElementsVisible = arrTabs.get(i).get(2).equals(selectedTabName);
@@ -160,6 +179,11 @@ public class RKTabPanelsManager implements IRKUIElement {
                 }
             }
             isSelectedTabChanged = false;
+
+            // line (selected tab) animation
+            if (lineHeight_animationY != 0) {
+                lineHeight_animationY = Math.max(0, lineHeight_animationY - LINE_HEIGHT / 3.5f);
+            }
         }
     }
 
@@ -181,16 +205,19 @@ public class RKTabPanelsManager implements IRKUIElement {
                 shapeRenderer.rect(getX(), getY() + getHeight(), getWidth(), LINE_HEIGHT);
 
                 // draw selected tab line
-                String selectedRectName = null;
+                String selectedRectName = null, previousRectName = null;
                 for (ArrayList<String> tab : arrTabs) {
-                    if (tab.get(2).equals(selectedTabName)) {
-                        selectedRectName = tab.get(1);
-                        break;
-                    }
+                    if (tab.get(2).equals(selectedTabName)) selectedRectName = tab.get(1);
+                    else if (tab.get(2).equals(previousSelectedTabName)) previousRectName = tab.get(1);
+
+                    if (selectedRectName != null && previousRectName != null) break;
                 }
                 if (selectedRectName != null) {
                     shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_TAB_SELECTED_LINE.r, GlobalColorsDark.DARK_COLOR_TAB_SELECTED_LINE.g, GlobalColorsDark.DARK_COLOR_TAB_SELECTED_LINE.b, Math.min(alpha, localAlpha));
-                    shapeRenderer.rect(LIB.getX(selectedRectName), LIB.getY(selectedRectName) - LINE_HEIGHT, LIB.getWidth(selectedRectName), LINE_HEIGHT * 3f);
+                    shapeRenderer.rect(LIB.getX(selectedRectName), LIB.getY(selectedRectName) - LINE_HEIGHT, LIB.getWidth(selectedRectName), LINE_HEIGHT * LINE_HEIGHT_KOF - lineHeight_animationY);
+
+                    // for line animation
+                    if (previousRectName != null) shapeRenderer.rect(LIB.getX(previousRectName), LIB.getY(previousRectName) - LINE_HEIGHT, LIB.getWidth(previousRectName), lineHeight_animationY);
                 }
 
                 shapeRenderer.end();

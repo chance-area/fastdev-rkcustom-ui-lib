@@ -11,19 +11,14 @@
 
 package ru.rodionkrainov.libgdxrkcustomuilib;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import java.awt.Cursor;
 import java.util.ArrayList;
@@ -32,10 +27,13 @@ import java.util.Objects;
 
 import javax.swing.JFrame;
 
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IButtonClickEvent;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKButton;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKLabel;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKRect;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKTabPanelsManager;
+import ru.rodionkrainov.libgdxrkcustomuilib.utils.CustomClickListener;
 
 public class LibGdxRKCustomUILib extends Actor {
     public static final String LIB_NAME    = "LibGdxRKCustomUILib";
@@ -43,7 +41,7 @@ public class LibGdxRKCustomUILib extends Actor {
 
     private boolean isAllResLoaded;
     private boolean isCanShowUIElements;
-    private boolean isShowLoadingLine;
+    private final boolean isShowLoadingLine;
     private final AssetManager assetManager;
 
     private final boolean IS_DESKTOP;
@@ -56,11 +54,8 @@ public class LibGdxRKCustomUILib extends Actor {
 
     private boolean isZIndexChanged = false;
 
-    // for click / touch events
-    private Vector2 vPointerPosition     = new Vector2(-1, -1);
-    private Vector2 vPointerDownPosition = new Vector2(-1, -1);
-    private Vector2 vPointerUpPosition   = new Vector2(-1, -1);
-    private boolean isPointerDown        = false;
+    // for click / touch / drag events
+    private final CustomClickListener customClickListener;
 
     // all elements
     private final ArrayList<IRKUIElement> arrRKUIElements = new ArrayList<>();
@@ -68,6 +63,7 @@ public class LibGdxRKCustomUILib extends Actor {
     private final ArrayList<RKLabel>            arrRKLabels            = new ArrayList<>();
     private final ArrayList<RKRect>             arrRKRects             = new ArrayList<>();
     private final ArrayList<RKTabPanelsManager> arrRKTabPanelsManagers = new ArrayList<>();
+    private final ArrayList<RKButton>           arrRKButtons           = new ArrayList<>();
 
     public LibGdxRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
         super();
@@ -93,33 +89,9 @@ public class LibGdxRKCustomUILib extends Actor {
         JFRAME     = _jframe;
 
         // 'unproject' camera already set
+        customClickListener = new CustomClickListener(_isDesktop);
         this.setTouchable(Touchable.enabled);
-        this.addListener(new ClickListener() {
-            @Override
-            public boolean touchDown(InputEvent _event, float _screenX, float _screenY, int _pointer, int _button) {
-                vPointerDownPosition.set(_screenX, _screenY);
-
-                //Gdx.app.log("TouchDown", "x = " + vPointerDownPosition.x + "; y = " + vPointerDownPosition.y);
-                return super.touchDown(_event, _screenX, _screenY, _pointer, _button);
-            }
-
-            @Override
-            public void touchUp(InputEvent _event, float _screenX, float _screenY, int _pointer, int _button) {
-                vPointerUpPosition.set(_screenX, _screenY);
-                if (!IS_DESKTOP) vPointerDownPosition = new Vector2(-1, -1);
-
-                //Gdx.app.log("TouchUp", "x = " + vPointerUpPosition.x + "; y = " + vPointerUpPosition.y);
-                super.touchUp(_event, _screenX, _screenY, _pointer, _button);
-            }
-
-            @Override
-            public boolean mouseMoved(InputEvent _event, float _screenX, float _screenY) {
-                vPointerPosition.set(_screenX, _screenY);
-
-                //Gdx.app.log("TouchMovePos", "x = " + vPointerPosition.x + "; y = " + vPointerPosition.y);
-                return super.mouseMoved(_event, _screenX, _screenY);
-            }
-        });
+        this.addListener(customClickListener);
     }
     public LibGdxRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
         this(_fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, true, _windowWidth, _windowHeight, _isDesktop, _jframe);
@@ -142,6 +114,10 @@ public class LibGdxRKCustomUILib extends Actor {
 
     public void hideLoadingLine() {
         isCanShowUIElements = true;
+    }
+
+    public boolean isLoadingLineVisible() {
+        return isCanShowUIElements;
     }
 
     public float getLoadingPercent() {
@@ -246,6 +222,9 @@ public class LibGdxRKCustomUILib extends Actor {
         }
         return null;
     }
+    public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex) {
+        return addLabel(_name, _text, _color, _fontSize, 0f, 0f, _zIndex, 0);
+    }
     public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY) {
         return addLabel(_name, _text, _color, _fontSize, 0f, 0f, 0, 0);
     }
@@ -311,6 +290,24 @@ public class LibGdxRKCustomUILib extends Actor {
     }
     public RKTabPanelsManager addTabPanelsManager(String _name, int _labelFontSize, Color _panelsBgColor) {
         return addTabPanelsManager(_name, 0f, 0f, _labelFontSize, _panelsBgColor, null, -1, 0);
+    }
+
+    // -------- Buttons ---------
+    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex, int _localZIndex) {
+        if (isAllResLoaded) {
+            RKButton rkButton = new RKButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, _localZIndex, this);
+
+            arrRKButtons.add(rkButton);
+            addElement(rkButton);
+            return rkButton;
+        }
+        return null;
+    }
+    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
+        return addButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
+    }
+    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
+        return addButton(_name, _text, _fontColor, _fontSize, 0, 0, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
     }
 
 
@@ -481,33 +478,35 @@ public class LibGdxRKCustomUILib extends Actor {
             isAllResLoaded = (getLoadingPercent() == 100f);
         } else if (isCanShowUIElements) {
             this.setBounds(0, 0, windowWidth, windowHeight);
-            isPointerDown = Gdx.input.isTouched();
-            if (!IS_DESKTOP) vPointerPosition = vPointerDownPosition;
+            customClickListener.update();
 
-            // Sorting elements by zIndex
+            // sorting elements by zIndex (from least to most)
             if (isZIndexChanged) {
                 arrRKUIElements.sort(Comparator.comparingInt(IRKUIElement::getZIndex));
                 isZIndexChanged = false;
             }
 
-            // hover event
+            // hover event (taking into account zIndex)
             boolean isHasHover = false;
             for (IRKUIElement uiElement : arrRKUIElements) uiElement.setIsPointerHover(false);
             for (int i = (arrRKUIElements.size() - 1); i >= 0; i--) {
                 IRKUIElement uiElement = arrRKUIElements.get(i);
 
                 if (uiElement.isVisible()) {
-                    boolean isHover = (vPointerPosition.x >= uiElement.getX() && vPointerPosition.x <= uiElement.getX() + uiElement.getWidth() && vPointerPosition.y >= uiElement.getY() && vPointerPosition.y <= uiElement.getY() + uiElement.getHeight());
+                    Vector2 vMovePos = customClickListener.getVecPointerMovePosition();
+                    boolean isHover = (vMovePos.x >= uiElement.getX() && vMovePos.x <= uiElement.getX() + uiElement.getWidth() && vMovePos.y >= uiElement.getY() && vMovePos.y <= uiElement.getY() + uiElement.getHeight());
                     uiElement.setIsPointerHover(isHover);
 
-                    if (!isHasHover && isHover) isHasHover = true;
-                    if (i != (arrRKUIElements.size() - 1) && arrRKUIElements.get((i + 1)).getZIndex() != uiElement.getZIndex() && isHasHover)
-                        break;
+                    if (isHover) break;
+                    //if (!isHasHover && isHover) isHasHover = true;
+                    //if (i != (arrRKUIElements.size() - 1) && arrRKUIElements.get((i + 1)).getZIndex() != uiElement.getZIndex() && isHasHover) break;
                 }
             }
 
+            // update elements
+            boolean[][] pointersStates = customClickListener.getPointersStates();
             for (IRKUIElement uiElement : arrRKUIElements) {
-                if (uiElement.isVisible()) uiElement.update(_delta);
+                if (uiElement.isVisible()) uiElement.update(_delta, pointersStates);
             }
         }
     }

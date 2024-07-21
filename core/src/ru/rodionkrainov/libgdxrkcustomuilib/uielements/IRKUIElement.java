@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 public interface IRKUIElement {
-    void update(float _delta);
+    void update(float _delta, boolean[][] _pointersStates);
     void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha);
 
     void setVisible(boolean _isVisible);

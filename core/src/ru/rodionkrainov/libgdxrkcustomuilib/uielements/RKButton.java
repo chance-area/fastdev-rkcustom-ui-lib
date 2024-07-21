@@ -5,92 +5,81 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.utils.Align;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.GlobalFontsManager;
+import java.awt.Cursor;
+
+import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
 
-public class RKLabel implements IRKUIElement {
+public class RKButton implements IRKUIElement {
     private String name;
     private int zIndex;
     private final int localZIndex;
+    private boolean isVisible = true;
     private boolean isPointerHover = false;
-
-    private final LibGdxRKCustomUILib LIB;
 
     private Color fillColor;
     private Color borderColor;
     private float alpha      = 1f;
     private float localAlpha = 1f;
+    private float borderSize;
 
-    private boolean isImage;
-    private String imgName;
+    private final LibGdxRKCustomUILib LIB;
+    private final IButtonClickEvent onButtonClickEvent;
 
-    private final int fontSize;
-    private final Label label;
+    private final RKRect buttonRect;
+    private final RKLabel buttonLabel;
 
-    public RKLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
+    public RKButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, IButtonClickEvent _onButtonClickEvent, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
 
+        fillColor   = _fillColor.cpy();
+        borderColor = (_borderColor != null ? _borderColor.cpy() : null);
+        borderSize  = _borderSize;
+
         LIB = _lib;
+        onButtonClickEvent = _onButtonClickEvent;
 
-        fillColor   = _color.cpy();
-        borderColor = new Color(0, 0, 0, alpha);
-
-        fontSize = _fontSize;
-
-        LabelStyle labelStyle = new LabelStyle();
-        labelStyle.font = GlobalFontsManager.ARR_BP_FONTS_10_TO_50[ (Math.max(0, Math.min((_fontSize - 10), 40))) ];
-
-        checkIsImg(_text);
-
-        label = new Label(_text, labelStyle);
-        label.setColor(fillColor);
-        label.setPosition(_posX, _posY);
-        label.setAlignment(Align.left);
-        label.pack();
-    }
-
-    private void checkIsImg(String _text) {
-        isImage = _text.contains("%#img_") && _text.contains("#%");
-        if (isImage) imgName = _text.substring(_text.indexOf("%#img_") + 6, _text.indexOf("#%"));
+        buttonRect  = LIB.addRect("button_" + _name + "_rect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, _roundRadius, _zIndex, localZIndex);
+        buttonLabel = LIB.addLabel("button_" + _name + "_label", _text, _fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 1);
     }
 
     @Override
     public void update(float _delta, boolean[][] _pointersStates) {
         if (alpha > 0 && localAlpha > 0) {
-            fillColor.a   = Math.min(alpha, localAlpha);
-            borderColor.a = Math.min(alpha, localAlpha);
+            fillColor.a = Math.min(localAlpha, alpha);
+            if (borderColor != null) borderColor.a = Math.min(localAlpha, alpha);
 
-            if (isImage) {
-                setSize(fontSize * 1.3f, fontSize * 1.3f);
+            buttonLabel.setPosition(buttonRect.getX() + (buttonRect.getWidth() - buttonLabel.getWidth()) / 2f, buttonRect.getY() + (buttonRect.getHeight() - buttonLabel.getHeight()) / 2f);
+
+            if (isPointerHover || LIB.isPointerHover(buttonLabel.getName())) {
+                LIB.changeCursor(Cursor.HAND_CURSOR);
+
+                fillColor   = GlobalColorsDark.DARK_COLOR_BUTTON_HOVER;
+                borderColor = GlobalColorsDark.DARK_COLOR_BUTTON_HOVER_BORDER;
+
+                if (Gdx.input.isTouched()) fillColor = GlobalColorsDark.DARK_COLOR_BUTTON_TOUCHED;
+                if (_pointersStates[0][1]) onButtonClickEvent.onButtonClick();
+            } else {
+                fillColor   = GlobalColorsDark.DARK_COLOR_BUTTON;
+                borderColor = GlobalColorsDark.DARK_COLOR_BUTTON_BORDER;
             }
 
-            label.setColor(fillColor);
-            label.act(_delta);
+            buttonRect.setFillColor(fillColor);
+            buttonRect.setBorderColor(borderColor);
         }
     }
 
     @Override
     public void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha) {
-        if (alpha > 0 && localAlpha > 0) {
-            if (isImage) {
-                Color batchColor = _batch.getColor();
-                _batch.setColor(batchColor.r, batchColor.g, batchColor.b, fillColor.a);
-                _batch.draw(LIB.getImageTexture(imgName), label.getX() - (getWidth() - label.getWidth()) / 2f, label.getY() - (getHeight() - label.getHeight()) / 2f, getWidth(), getHeight());
-            } else {
-                label.draw(_batch, _parentAlpha);
-            }
-        }
+        // ignore
     }
 
     @Override
     public void setVisible(boolean _isVisible) {
-        label.setVisible(_isVisible);
+        isVisible = _isVisible;
     }
 
     @Override
@@ -100,7 +89,7 @@ public class RKLabel implements IRKUIElement {
 
     @Override
     public boolean isVisible() {
-        return label.isVisible();
+        return isVisible;
     }
 
     @Override
@@ -113,63 +102,58 @@ public class RKLabel implements IRKUIElement {
         name = _name;
     }
 
-    public void setText(String _text) {
-        checkIsImg(_text);
-        label.setText(_text);
-
-        if (!isImage) label.pack();
-    }
-
     @Override
     public void setPosition(float _x, float _y) {
-        label.setPosition(_x, _y);
+        buttonRect.setPosition(_x, _y);
     }
 
     @Override
     public void setX(float _x) {
-        label.setX(_x);
+        buttonRect.setX(_x);
     }
 
     @Override
     public void setY(float _y) {
-        label.setY(_y);
+        buttonRect.setY(_y);
     }
 
     @Override
     public void setSize(float _w, float _h) {
-        label.setSize(_w, _h);
+        buttonRect.setSize(_w, _h);
     }
 
     @Override
     public void setWidth(float _w) {
-        label.setWidth(_w);
+        buttonRect.setWidth(_w);
     }
 
     @Override
     public void setHeight(float _h) {
-        label.setHeight(_h);
+        buttonRect.setHeight(_h);
     }
 
     @Override
     public void setFillColor(Color _color) {
-        fillColor = _color.cpy();
-        fillColor.a = Math.min(alpha, localAlpha);
+        fillColor = _color;
     }
 
     @Override
     public void setBorderColor(Color _color) {
-        borderColor = _color.cpy();
-        borderColor.a = Math.min(alpha, localAlpha);
+        borderColor = _color;
     }
 
     @Override
     public void setAlpha(float _alpha) {
         alpha = _alpha;
+        buttonRect.setAlpha(_alpha);
+        buttonLabel.setAlpha(_alpha);
     }
 
     @Override
     public void setLocalAlpha(float _localAlpha) {
         localAlpha = _localAlpha;
+        buttonRect.setLocalAlpha(_localAlpha);
+        buttonLabel.setLocalAlpha(_localAlpha);
     }
 
     @Override
@@ -182,39 +166,34 @@ public class RKLabel implements IRKUIElement {
         return name;
     }
 
-    public String getText() {
-        return label.getText().toString();
-    }
-
     @Override
     public Vector2 getPosition() {
-        return (new Vector2(label.getX(), label.getY()));
+        return buttonRect.getPosition();
     }
 
     @Override
     public float getX() {
-        return label.getX();
+        return buttonRect.getX();
     }
 
     @Override
     public float getY() {
-        return label.getY();
+        return buttonRect.getY();
     }
 
     @Override
     public Vector2 getSize() {
-        if (!isImage) label.pack();
-        return (new Vector2(label.getWidth(), label.getHeight()));
+        return buttonRect.getSize();
     }
 
     @Override
     public float getWidth() {
-        return label.getWidth();
+        return buttonRect.getWidth();
     }
 
     @Override
     public float getHeight() {
-        return label.getHeight();
+        return buttonRect.getHeight();
     }
 
     @Override
@@ -239,7 +218,7 @@ public class RKLabel implements IRKUIElement {
 
     @Override
     public String getType() {
-        return "label";
+        return "button";
     }
 
     @Override
@@ -254,6 +233,7 @@ public class RKLabel implements IRKUIElement {
 
     @Override
     public void dispose() {
-        label.remove();
+        buttonRect.dispose();
+        buttonLabel.dispose();
     }
 }

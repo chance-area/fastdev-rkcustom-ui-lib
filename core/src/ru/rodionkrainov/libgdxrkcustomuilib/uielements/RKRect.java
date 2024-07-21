@@ -20,7 +20,6 @@ public class RKRect implements IRKUIElement {
     private Color borderColor;
     private float alpha      = 1f;
     private float localAlpha = 1f;
-
     private float borderSize;
 
     private int arcSegments = 32;
@@ -51,7 +50,7 @@ public class RKRect implements IRKUIElement {
     }
 
     @Override
-    public void update(float _delta) {
+    public void update(float _delta, boolean[][] _pointersStates) {
         if (alpha > 0 && localAlpha > 0) {
             fillColor.a = Math.min(alpha, localAlpha);
             if (borderColor != null) borderColor.a = Math.min(alpha, localAlpha);
