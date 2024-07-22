@@ -15,6 +15,7 @@ public class RKRect implements IRKUIElement {
     private final int localZIndex;
     private boolean isVisible = true;
     private boolean isPointerHover = false;
+    private boolean isInFocus = false;
 
     private Color fillColor;
     private Color borderColor;
@@ -205,6 +206,11 @@ public class RKRect implements IRKUIElement {
     }
 
     @Override
+    public void setIsInFocus(boolean _isInFocus) {
+        isInFocus = _isInFocus;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -272,6 +278,11 @@ public class RKRect implements IRKUIElement {
     @Override
     public int getLocalZIndex() {
         return localZIndex;
+    }
+
+    @Override
+    public boolean isInFocus() {
+        return isInFocus;
     }
 
     @Override

@@ -11,6 +11,7 @@
 
 package ru.rodionkrainov.libgdxrkcustomuilib;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -124,6 +125,10 @@ public class LibGdxRKCustomUILib extends Actor {
         return (float) (GlobalFontsManager.numLoadedBpFonts + GlobalImagesManager.numLoadedImgTextures) / (GlobalFontsManager.numBpFonts + GlobalImagesManager.numImgTextures) * 100f;
     }
 
+    public boolean[][] getPointersStates() {
+        return customClickListener.getPointersStates(false);
+    }
+
     public boolean isDesktop() {
         return IS_DESKTOP;
     }
@@ -203,6 +208,14 @@ public class LibGdxRKCustomUILib extends Actor {
                     for (int i = 0; i < arrRKTabPanelsManagers.size(); i++) {
                         if (arrRKTabPanelsManagers.get(i).getName().equals(_name)) {
                             arrRKTabPanelsManagers.remove(i);
+                            break;
+                        }
+                    }
+                }
+                case "button" -> {
+                    for (int i = 0; i < arrRKButtons.size(); i++) {
+                        if (arrRKButtons.get(i).getName().equals(_name)) {
+                            arrRKButtons.remove(i);
                             break;
                         }
                     }
@@ -293,9 +306,9 @@ public class LibGdxRKCustomUILib extends Actor {
     }
 
     // -------- Buttons ---------
-    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex, int _localZIndex) {
+    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
-            RKButton rkButton = new RKButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, _localZIndex, this);
+            RKButton rkButton = new RKButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, _localZIndex, this);
 
             arrRKButtons.add(rkButton);
             addElement(rkButton);
@@ -303,11 +316,11 @@ public class LibGdxRKCustomUILib extends Actor {
         }
         return null;
     }
-    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
-        return addButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
+    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
+        return addButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
     }
-    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
-        return addButton(_name, _text, _fontColor, _fontSize, 0, 0, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
+    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
+        return addButton(_name, _text, _fontColor, _fontSize, 0, 0, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
     }
 
 
@@ -343,6 +356,14 @@ public class LibGdxRKCustomUILib extends Actor {
         if (isAllResLoaded) {
             for (int i = 0; i < arrRKTabPanelsManagers.size(); i++) {
                 if (arrRKTabPanelsManagers.get(i).getName().equals(_name)) return arrRKTabPanelsManagers.get(i);
+            }
+        }
+        return null;
+    }
+    private RKButton foundAndGetButton(String _name) {
+        if (isAllResLoaded) {
+            for (int i = 0; i < arrRKButtons.size(); i++) {
+                if (arrRKButtons.get(i).getName().equals(_name)) return arrRKButtons.get(i);
             }
         }
         return null;
@@ -389,6 +410,9 @@ public class LibGdxRKCustomUILib extends Actor {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setZIndex(_zIndex);
         isZIndexChanged = true;
     }
+    public void setIsInFocus(String _nameElement, boolean _isInFocus) {
+        Objects.requireNonNull(foundAndGetElement(_nameElement)).setIsInFocus(_isInFocus);
+    }
 
     // ### For All (getters) ###
     public String getType(String _nameElement) {
@@ -433,6 +457,9 @@ public class LibGdxRKCustomUILib extends Actor {
     public int getZIndex(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getZIndex();
     }
+    public boolean isInFocus(String _nameElement) {
+        return Objects.requireNonNull(foundAndGetElement(_nameElement)).isInFocus();
+    }
 
     // ### Label (setters) ###
     public void setLabelText(String _nameLabel, String _text) {
@@ -456,6 +483,11 @@ public class LibGdxRKCustomUILib extends Actor {
     // ### Tabs (getters) ###
     public RKTabPanelsManager getRKTabPanelsManager(String _nameTabPanelsManager) {
         return foundAndGetTabPanelsManager(_nameTabPanelsManager);
+    }
+
+    // ### Buttons ###
+    public RKButton getRKButton(String _nameButton) {
+        return foundAndGetButton(_nameButton);
     }
 
 
@@ -486,22 +518,38 @@ public class LibGdxRKCustomUILib extends Actor {
                 isZIndexChanged = false;
             }
 
-            // hover event (taking into account zIndex)
+            // hover event (taking into account zIndex); check focus state
+            String checkStep = "hover"; // 'hover' or 'focus'
             boolean isHasHover = false;
             for (IRKUIElement uiElement : arrRKUIElements) uiElement.setIsPointerHover(false);
             for (int i = (arrRKUIElements.size() - 1); i >= 0; i--) {
                 IRKUIElement uiElement = arrRKUIElements.get(i);
 
-                if (uiElement.isVisible()) {
-                    Vector2 vMovePos = customClickListener.getVecPointerMovePosition();
-                    boolean isHover = (vMovePos.x >= uiElement.getX() && vMovePos.x <= uiElement.getX() + uiElement.getWidth() && vMovePos.y >= uiElement.getY() && vMovePos.y <= uiElement.getY() + uiElement.getHeight());
-                    uiElement.setIsPointerHover(isHover);
+                if (uiElement.isVisible() && (uiElement.getType().equals("label") || uiElement.getType().equals("rect"))) {
+                    if (checkStep.equals("hover")) {
+                        Vector2 vMovePos = customClickListener.getVecPointerMovePosition();
+                        isHasHover = (vMovePos.x >= uiElement.getX() && vMovePos.x <= uiElement.getX() + uiElement.getWidth() && vMovePos.y >= uiElement.getY() && vMovePos.y <= uiElement.getY() + uiElement.getHeight());
 
-                    if (isHover) break;
-                    //if (!isHasHover && isHover) isHasHover = true;
-                    //if (i != (arrRKUIElements.size() - 1) && arrRKUIElements.get((i + 1)).getZIndex() != uiElement.getZIndex() && isHasHover) break;
+                        if (isHasHover) {
+                            uiElement.setIsPointerHover(true);
+
+                            checkStep = "focus";
+                            i = arrRKUIElements.size(); // continue and reset 'i'
+                        }
+                    }
+
+                    // check focus (is hover and pointer down - element in focus)
+                    else {
+                        if (uiElement.isPointerHover() && customClickListener.getPointersStates(false)[0][0]) {
+                            for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
+
+                            uiElement.setIsInFocus(true);
+                            break;
+                        }
+                    }
                 }
             }
+            if (!isHasHover && customClickListener.getPointersStates(false)[0][1]) for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
 
             // update elements
             boolean[][] pointersStates = customClickListener.getPointersStates();

@@ -17,6 +17,7 @@ public class RKLabel implements IRKUIElement {
     private int zIndex;
     private final int localZIndex;
     private boolean isPointerHover = false;
+    private boolean isInFocus = false;
 
     private final LibGdxRKCustomUILib LIB;
 
@@ -178,6 +179,11 @@ public class RKLabel implements IRKUIElement {
     }
 
     @Override
+    public void setIsInFocus(boolean _isInFocus) {
+        isInFocus = _isInFocus;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -250,6 +256,11 @@ public class RKLabel implements IRKUIElement {
     @Override
     public int getLocalZIndex() {
         return localZIndex;
+    }
+
+    @Override
+    public boolean isInFocus() {
+        return isInFocus;
     }
 
     @Override

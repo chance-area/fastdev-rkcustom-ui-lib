@@ -26,6 +26,7 @@ public interface IRKUIElement {
     void setAlpha(float _alpha);
     void setLocalAlpha(float _localAlpha);
     void setZIndex(int _zIndex);
+    void setIsInFocus(boolean _isInFocus);
 
     String getName();
     Vector2 getPosition();
@@ -43,6 +44,7 @@ public interface IRKUIElement {
 
     int getZIndex();
     int getLocalZIndex();
+    boolean isInFocus();
 
     void dispose();
 }

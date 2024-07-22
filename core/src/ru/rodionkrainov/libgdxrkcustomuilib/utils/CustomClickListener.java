@@ -86,13 +86,16 @@ public class CustomClickListener extends ClickListener {
         return vPointerMovePosition;
     }
 
-    public boolean[][] getPointersStates() {
+    public boolean[][] getPointersStates(boolean _isReset) {
         boolean[][] tpmStates = new boolean[ pointersStates.length ][ pointersStates[0].length ];
-
         for (int i = 0; i < tpmStates.length; i++) System.arraycopy(pointersStates[i], 0, tpmStates[i], 0, tpmStates[i].length);
-        resetPointersStates();
+
+        if (_isReset) resetPointersStates();
 
         return tpmStates;
+    }
+    public boolean[][] getPointersStates() {
+        return getPointersStates(true);
     }
 
 

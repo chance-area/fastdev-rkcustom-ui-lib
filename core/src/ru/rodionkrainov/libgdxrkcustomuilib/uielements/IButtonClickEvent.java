@@ -1,5 +1,5 @@
 package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
 
 public interface IButtonClickEvent {
-    void onButtonClick();
+    void onButtonClick(RKButton _self);
 }

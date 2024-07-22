@@ -115,8 +115,14 @@ public class TestsUIElements extends ApplicationAdapter {
         rkCustomUILib.addLabel(nameLabelExampleOne, "Пример текста («первый»)", GlobalColorsDark.DARK_COLOR_RED, (isDesktop ? 20 : 22), 3);
         rkCustomUILib.addLabel(nameLabelExampleTwo, "Пример текста («второй»)", GlobalColorsDark.DARK_COLOR_GREEN, (isDesktop ? 20 : 22), 3);
 
-        buttonOne = rkCustomUILib.addButton("simple_button_1", "Кнопка 1", GlobalColorsDark.DARK_COLOR_WHITE, 20, 100, 100, 120, 45, GlobalColorsDark.DARK_COLOR_BUTTON, GlobalColorsDark.DARK_COLOR_BUTTON_BORDER, 2, 10f, () -> Gdx.app.log("BUTTON_CLICK", "but_1"), 4);
-        buttonTwo = rkCustomUILib.addButton("simple_button_2", "Кнопка 2", GlobalColorsDark.DARK_COLOR_WHITE, 20, 80, 120, 120, 45, GlobalColorsDark.DARK_COLOR_BUTTON, GlobalColorsDark.DARK_COLOR_BUTTON_BORDER, 2, 10f, () -> Gdx.app.log("BUTTON_CLICK", "but_2"), 3);
+        buttonOne = rkCustomUILib.addButton("simple_button_1", "Кнопка 1", GlobalColorsDark.DARK_COLOR_WHITE, 24, 200, 100, 130, 50, 2, 10f, (_self) -> {
+            _self.setFontColor(GlobalColorsDark.DARK_COLOR_GREEN);
+            _self.setText("Нажата!");
+        }, 4);
+        buttonTwo = rkCustomUILib.addButton("simple_button_2", "Кнопка 2", GlobalColorsDark.DARK_COLOR_WHITE, 24, 180, 120, 130, 50, 2, 10f, (_self) -> {
+            _self.setFontColor(GlobalColorsDark.DARK_COLOR_GREEN);
+            _self.setText("Нажата!");
+        }, 3);
         buttonOne.setAlpha(0.7f);
         buttonTwo.setAlpha(1f);
 
@@ -178,6 +184,15 @@ public class TestsUIElements extends ApplicationAdapter {
 
                 tabPanelsManagerTwo.setSize((isDesktop ? 500 : 600), 420);
                 tabPanelsManagerTwo.setPosition(windowWidth * 0.45f, windowHeight * 0.13f);
+
+                if (!buttonOne.isInFocus()) {
+                    buttonOne.setFontColor(GlobalColorsDark.DARK_COLOR_WHITE);
+                    buttonOne.setText("Кнопка 1");
+                }
+                if (!buttonTwo.isInFocus()) {
+                    buttonTwo.setFontColor(GlobalColorsDark.DARK_COLOR_WHITE);
+                    buttonTwo.setText("Кнопка 2");
+                }
 
                 if (!rkCustomUILib.isLoadingLineVisible()) rkCustomUILib.hideLoadingLine();
             }
