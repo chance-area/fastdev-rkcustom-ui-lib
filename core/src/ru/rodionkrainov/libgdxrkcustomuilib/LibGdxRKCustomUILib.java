@@ -11,7 +11,6 @@
 
 package ru.rodionkrainov.libgdxrkcustomuilib;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -28,12 +27,14 @@ import java.util.Objects;
 
 import javax.swing.JFrame;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IButtonClickEvent;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.IButtonClickEvent;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKButton;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKLabel;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKRect;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKTabPanelsManager;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKButton;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKImage;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKLabel;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKRect;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKSpinner;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKTabPanelsManager;
 import ru.rodionkrainov.libgdxrkcustomuilib.utils.CustomClickListener;
 
 public class LibGdxRKCustomUILib extends Actor {
@@ -44,6 +45,21 @@ public class LibGdxRKCustomUILib extends Actor {
     private boolean isCanShowUIElements;
     private final boolean isShowLoadingLine;
     private final AssetManager assetManager;
+
+    public enum DefaultImages {
+        SETTINGS_ICON,
+        INFO_ICON,
+        HELP_ICON,
+        ARROW_UP,
+        ARROW_DOWN
+    }
+    private final String[][] DEFAULT_IMAGES_NAMES_PATH = new String[][] {
+            {"defImg_settings_icon_defImg", "settings_256x256.png"},
+            {"defImg_info_icon_defImg", "info_256x256.png"},
+            {"defImg_help_icon_defImg", "help_256x256.png"},
+            {"defImg_arrow_up_defImg", "arrow_up_256x256.png"},
+            {"defImg_arrow_down_defImg", "arrow_down_256x256.png"},
+    };
 
     private final boolean IS_DESKTOP;
     private final JFrame JFRAME;
@@ -65,6 +81,8 @@ public class LibGdxRKCustomUILib extends Actor {
     private final ArrayList<RKRect>             arrRKRects             = new ArrayList<>();
     private final ArrayList<RKTabPanelsManager> arrRKTabPanelsManagers = new ArrayList<>();
     private final ArrayList<RKButton>           arrRKButtons           = new ArrayList<>();
+    private final ArrayList<RKImage>            arrRKImages            = new ArrayList<>();
+    private final ArrayList<RKSpinner>          arrRKSpinners          = new ArrayList<>();
 
     public LibGdxRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
         super();
@@ -78,8 +96,14 @@ public class LibGdxRKCustomUILib extends Actor {
         isCanShowUIElements = false;
         assetManager        = new AssetManager();
 
+        String[][] imagesNamesPath = new String[ (DEFAULT_IMAGES_NAMES_PATH.length + (_imagesNamesPath != null ? _imagesNamesPath.length : 0)) ][2];
+        for (int i = 0; i < imagesNamesPath.length; i++) {
+            if (i < DEFAULT_IMAGES_NAMES_PATH.length) imagesNamesPath[i] = DEFAULT_IMAGES_NAMES_PATH[i];
+            else if (_imagesNamesPath != null) imagesNamesPath[i] = _imagesNamesPath[ (i - DEFAULT_IMAGES_NAMES_PATH.length) ];
+        }
+
         GlobalFontsManager.init(_fontFilePath, _fontBorderWidth, _fontSpaceX);
-        if (_pngFilesFolder != null) GlobalImagesManager.init(_pngFilesFolder, _imagesNamesPath, assetManager);
+        GlobalImagesManager.init(_pngFilesFolder, imagesNamesPath, assetManager);
 
         if (!isShowLoadingLine) {
             for (int i = 0; i < GlobalFontsManager.numBpFonts; i++) GlobalFontsManager.loadNext();
@@ -123,6 +147,10 @@ public class LibGdxRKCustomUILib extends Actor {
 
     public float getLoadingPercent() {
         return (float) (GlobalFontsManager.numLoadedBpFonts + GlobalImagesManager.numLoadedImgTextures) / (GlobalFontsManager.numBpFonts + GlobalImagesManager.numImgTextures) * 100f;
+    }
+
+    public String getDefaultImageName(DefaultImages _defaultImgName) {
+        return DEFAULT_IMAGES_NAMES_PATH[ _defaultImgName.ordinal() ][0];
     }
 
     public boolean[][] getPointersStates() {
@@ -321,6 +349,39 @@ public class LibGdxRKCustomUILib extends Actor {
     }
     public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
         return addButton(_name, _text, _fontColor, _fontSize, 0, 0, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
+    }
+
+    // --------- Images ----------
+    public RKImage addImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex, int _localZIndex) {
+        if (isAllResLoaded) {
+            RKImage rkImage = new RKImage(_name, _imgTextureName, _posX, _posY, _w, _h, _zIndex, _localZIndex, this);
+
+            arrRKImages.add(rkImage);
+            addElement(rkImage);
+            return rkImage;
+        }
+        return null;
+    }
+    public RKImage addImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex) {
+        return addImage(_name, _imgTextureName, _posX, _posY, _w, _h, _zIndex, 0);
+    }
+
+    // -------- Spinners ---------
+    public RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
+        if (isAllResLoaded) {
+            RKSpinner rkSpinner = new RKSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, _localZIndex, this);
+
+            arrRKSpinners.add(rkSpinner);
+            addElement(rkSpinner);
+            return rkSpinner;
+        }
+        return null;
+    }
+    public RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
+        return addSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, 0);
+    }
+    public RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
+        return addSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, 0, 0, _w, _h, _borderSize, _roundRadius, _zIndex, 0);
     }
 
 

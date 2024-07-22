@@ -104,6 +104,7 @@ public class CustomClickListener extends ClickListener {
     ------------------------------------------------------------ */
 
     public void update() {
+        // on mobile systems don't work event 'mouseMoved'
         if (!isDesktop) {
             vPointerMovePosition.set(vPointerDownPosition);
 
@@ -111,8 +112,6 @@ public class CustomClickListener extends ClickListener {
                 numIterationsToResetDownVPos = -1;
                 vPointerDownPosition.set(-1, -1);
             } else numIterationsToResetDownVPos--;
-        } else {
-            //vPointerMovePosition.set( (Gdx.input.isTouched() ? vPointerDownPosition : vPointerMovePosition) );
         }
     }
 

@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
+package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -10,6 +10,7 @@ import java.awt.Cursor;
 
 import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 
 public class RKButton implements IRKUIElement {
     private String name;
@@ -51,9 +52,9 @@ public class RKButton implements IRKUIElement {
 
     @Override
     public void update(float _delta, boolean[][] _pointersStates) {
-        isInFocus = (buttonLabel.isInFocus() || buttonRect.isInFocus());
-
         if (alpha > 0 && localAlpha > 0) {
+            isInFocus = (buttonLabel.isInFocus() || buttonRect.isInFocus());
+
             fontColor.a = Math.min(localAlpha, alpha);
             fillColor.a = Math.min(localAlpha, alpha);
             if (borderColor != null) borderColor.a = Math.min(localAlpha, alpha);
@@ -87,6 +88,8 @@ public class RKButton implements IRKUIElement {
     @Override
     public void setVisible(boolean _isVisible) {
         isVisible = _isVisible;
+        buttonLabel.setIsInFocus(_isVisible);
+        buttonRect.setVisible(_isVisible);
     }
 
     @Override
@@ -145,16 +148,16 @@ public class RKButton implements IRKUIElement {
 
     @Override
     public void setFillColor(Color _color) {
-        fillColor = _color;
+        fillColor = _color.cpy();
     }
 
     public void setFontColor(Color _color) {
-        fontColor = _color;
+        fontColor = _color.cpy();
     }
 
     @Override
     public void setBorderColor(Color _color) {
-        borderColor = _color;
+        borderColor = _color.cpy();
     }
 
     @Override

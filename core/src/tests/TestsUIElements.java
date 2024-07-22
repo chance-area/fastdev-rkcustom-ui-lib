@@ -23,10 +23,10 @@ import javax.swing.JFrame;
 
 import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IButtonClickEvent;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKButton;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.RKTabPanelsManager;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKButton;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKSpinner;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKTabPanelsManager;
 
 public class TestsUIElements extends ApplicationAdapter {
     public static boolean isDesktop       = false;
@@ -55,6 +55,8 @@ public class TestsUIElements extends ApplicationAdapter {
     private RKTabPanelsManager tabPanelsManagerTwo;
     private RKButton buttonOne;
     private RKButton buttonTwo;
+    private RKSpinner spinnerOne;
+    private RKSpinner spinnerTwo;
 
     public TestsUIElements() {
         isDesktop = false;
@@ -97,9 +99,7 @@ public class TestsUIElements extends ApplicationAdapter {
         // ------------ ### Init lib ### ------------
         // format: {'name', 'path to file'}
         String[][] imagesNamesPath = new String[][] {
-                {"settings_icon", "settings_512x512.png"},
-                {"info_icon", "info_512x512.png"},
-                {"help_icon", "help_512x512.png"}
+                //
         };
         rkCustomUILib = new LibGdxRKCustomUILib("fonts/ubuntu/ubuntu-regular.ttf", 0f, 2, "png", imagesNamesPath, false, windowWidth, windowHeight, isDesktop, superDuperJFrame);
 
@@ -115,16 +115,19 @@ public class TestsUIElements extends ApplicationAdapter {
         rkCustomUILib.addLabel(nameLabelExampleOne, "Пример текста («первый»)", GlobalColorsDark.DARK_COLOR_RED, (isDesktop ? 20 : 22), 3);
         rkCustomUILib.addLabel(nameLabelExampleTwo, "Пример текста («второй»)", GlobalColorsDark.DARK_COLOR_GREEN, (isDesktop ? 20 : 22), 3);
 
-        buttonOne = rkCustomUILib.addButton("simple_button_1", "Кнопка 1", GlobalColorsDark.DARK_COLOR_WHITE, 24, 200, 100, 130, 50, 2, 10f, (_self) -> {
+        buttonOne = rkCustomUILib.addButton("simple_button_1", "Кнопка 1", GlobalColorsDark.DARK_COLOR_WHITE, 24, 200, 100, 130, 50, 2, 6f, (_self) -> {
             _self.setFontColor(GlobalColorsDark.DARK_COLOR_GREEN);
             _self.setText("Нажата!");
         }, 4);
-        buttonTwo = rkCustomUILib.addButton("simple_button_2", "Кнопка 2", GlobalColorsDark.DARK_COLOR_WHITE, 24, 180, 120, 130, 50, 2, 10f, (_self) -> {
+        buttonTwo = rkCustomUILib.addButton("simple_button_2", "Кнопка 2", GlobalColorsDark.DARK_COLOR_WHITE, 24, 180, 120, 130, 50, 2, 6f, (_self) -> {
             _self.setFontColor(GlobalColorsDark.DARK_COLOR_GREEN);
             _self.setText("Нажата!");
         }, 3);
         buttonOne.setAlpha(0.7f);
         buttonTwo.setAlpha(1f);
+
+        spinnerOne = rkCustomUILib.addSpinner("simple_spinner_1", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 400, 320, 52, 2f, 6f, 3);
+        spinnerTwo = rkCustomUILib.addSpinner("simple_spinner_2", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 300, 320, 52, 2f, 6f, 3);
 
         // init and add tab panels managers
         tabPanelsManagerOne = rkCustomUILib.addTabPanelsManager("tab_panels_manager_1", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_1, 1);
@@ -134,14 +137,14 @@ public class TestsUIElements extends ApplicationAdapter {
         tabPanelsManagerOne.addTab("base_elements", "Базовые элементы");
         tabPanelsManagerOne.addTab("3d_elements", "3D среда");
         tabPanelsManagerOne.addTab("graphs_elements", "Графики");
-        tabPanelsManagerOne.addTab("settings_elements", "%#img_settings_icon#%", 1);
+        tabPanelsManagerOne.addTab("settings_elements", "%#img_" + rkCustomUILib.getDefaultImageName(LibGdxRKCustomUILib.DefaultImages.SETTINGS_ICON) + "#%", 1);
 
         // tab panel 2 (mini, attach to main)
         tabPanelsManagerTwo.addTab("example_one", "Пример 1");
         tabPanelsManagerTwo.addTab("example_two", "Пример 2");
 
         // attach elements to main tabPanelsManager (1)
-        tabPanelsManagerOne.attachElementsToTabPanel("base_elements", new IRKUIElement[]{tabPanelsManagerTwo, buttonOne, buttonTwo});
+        tabPanelsManagerOne.attachElementsToTabPanel("base_elements", new IRKUIElement[]{tabPanelsManagerTwo, buttonOne, buttonTwo, spinnerOne, spinnerTwo});
 
         // attach elements to mini tabPanelsManager (2)
         tabPanelsManagerTwo.attachElementsToTabPanel("example_one", new String[]{nameLabelExampleOne});

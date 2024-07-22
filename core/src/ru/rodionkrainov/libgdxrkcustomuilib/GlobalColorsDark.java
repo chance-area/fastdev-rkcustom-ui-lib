@@ -13,9 +13,10 @@ public abstract class GlobalColorsDark {
     public static final Color DARK_COLOR_TABBED_PANEL_2    = new Color(29f / 255f, 30f / 255f, 33f / 255f, 1f);
     public static final Color DARK_COLOR_TABBED_TEXT       = new Color(129f / 255f, 130f / 255f, 133f / 255f, 1f);
 
-    public static final Color DARK_COLOR_SPINNER        = new Color(70f / 255f, 73f / 255f, 75f / 255f, 1f);
-    public static final Color DARK_COLOR_SPINNER_BORDER = new Color(91f / 255f, 92f / 255f, 95f / 255f, 1f);
-    public static final Color DARK_COLOR_SPINNER_BUTTON = new Color(65f / 255f, 68f / 255f, 70f / 255f, 1f);
+    public static final Color DARK_COLOR_SPINNER              = new Color(70f / 255f, 73f / 255f, 75f / 255f, 1f);
+    public static final Color DARK_COLOR_SPINNER_BORDER       = new Color(91f / 255f, 92f / 255f, 95f / 255f, 1f);
+    public static final Color DARK_COLOR_SPINNER_FOCUS_BORDER = new Color(58f / 255f, 90f / 255f, 127f / 255f, 1f);
+    public static final Color DARK_COLOR_SPINNER_BUTTON       = new Color(65f / 255f, 68f / 255f, 70f / 255f, 1f);
 
     public static final Color DARK_COLOR_DROPDOWN_BOX        = new Color(70f / 255f, 73f / 255f, 75f / 255f, 1f);
     public static final Color DARK_COLOR_DROPDOWN_BOX_BORDER = new Color(91f / 255f, 92f / 255f, 95f / 255f, 1f);

@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
+package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.libgdxrkcustomuilib.utils.DrawingTools;
 
 public class RKRect implements IRKUIElement {

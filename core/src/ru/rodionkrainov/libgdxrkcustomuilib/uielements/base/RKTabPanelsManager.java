@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
+package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.libgdxrkcustomuilib.utils.DrawingTools;
 
 public class RKTabPanelsManager implements IRKUIElement {
@@ -130,6 +131,8 @@ public class RKTabPanelsManager implements IRKUIElement {
     @Override
     public void update(float _delta, boolean[][] _pointersStates) {
         if (isVisible && alpha > 0 && localAlpha > 0) {
+            isInFocus = true;
+
             fillColor.a = Math.min(alpha, localAlpha);
             if (borderColor != null) borderColor.a = Math.min(alpha, localAlpha);
 
@@ -141,7 +144,7 @@ public class RKTabPanelsManager implements IRKUIElement {
                 LIB.setZIndex(labelName, zIndex);
                 LIB.setZIndex(rectName, zIndex);
 
-                float tabRectWidth = LIB.getSize(labelName).x + TABS_TITLES_PADDING_LR * 2;
+                float tabRectWidth = LIB.getSize(labelName).x + TABS_TITLES_PADDING_LR * 2 - (LIB.getRKLabel(labelName).isHasImage() ? TABS_TITLES_PADDING_LR * 1.4f : 0);
                 float tabRectX     = getPosition().x + (arrTabs.get(i).get(4).equals("left") ? (i > 0 ? (SPACE_BETWEEN_TABS + sumWidthLeft) : 0) : (getSize().x - tabRectWidth) - (i > 0 ? (SPACE_BETWEEN_TABS + sumWidthRight) : 0));
                 float tabRectY     = getPosition().y + getHeight() + LINE_HEIGHT;
 
@@ -179,8 +182,8 @@ public class RKTabPanelsManager implements IRKUIElement {
                         boolean isElementsVisible = arrTabs.get(i).get(2).equals(selectedTabName);
 
                         for (int j = 5; j < arrTabs.get(i).size(); j++) {
-                            String element = arrTabs.get(i).get(j);
-                            LIB.setLocalAlpha(element, (isElementsVisible ? LIB.getAlpha(element) : 0f));
+                            String elementName = arrTabs.get(i).get(j);
+                            LIB.setLocalAlpha(elementName, (isElementsVisible ? LIB.getAlpha(elementName) : 0f));
                         }
                     }
                 }

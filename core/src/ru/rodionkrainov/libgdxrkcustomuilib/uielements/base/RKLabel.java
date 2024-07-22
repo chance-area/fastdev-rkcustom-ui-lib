@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
+package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align;
 
 import ru.rodionkrainov.libgdxrkcustomuilib.GlobalFontsManager;
 import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 
 public class RKLabel implements IRKUIElement {
     private String name;
@@ -27,7 +28,7 @@ public class RKLabel implements IRKUIElement {
     private float localAlpha = 1f;
 
     private boolean isImage;
-    private String imgName;
+    private RKImage image;
 
     private final int fontSize;
     private final Label label;
@@ -58,7 +59,10 @@ public class RKLabel implements IRKUIElement {
 
     private void checkIsImg(String _text) {
         isImage = _text.contains("%#img_") && _text.contains("#%");
-        if (isImage) imgName = _text.substring(_text.indexOf("%#img_") + 6, _text.indexOf("#%"));
+        if (isImage) {
+            String imgTextureName = _text.substring(_text.indexOf("%#img_") + 6, _text.indexOf("#%"));
+            image = LIB.addImage("label_" + name + "_img", imgTextureName, 0, 0, 0, 0, zIndex, localZIndex + 1);
+        }
     }
 
     @Override
@@ -68,7 +72,10 @@ public class RKLabel implements IRKUIElement {
             borderColor.a = Math.min(alpha, localAlpha);
 
             if (isImage) {
-                setSize(fontSize * 1.3f, fontSize * 1.3f);
+                setSize(fontSize * 1.27f, fontSize * 1.27f);
+
+                image.setSize(getWidth(), getHeight());
+                image.setPosition(label.getX() - (getWidth() - label.getWidth()) / 2f, label.getY() - (getHeight() - label.getHeight()) / 2f);
             }
 
             label.setColor(fillColor);
@@ -79,14 +86,12 @@ public class RKLabel implements IRKUIElement {
     @Override
     public void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha) {
         if (alpha > 0 && localAlpha > 0) {
-            if (isImage) {
-                Color batchColor = _batch.getColor();
-                _batch.setColor(batchColor.r, batchColor.g, batchColor.b, fillColor.a);
-                _batch.draw(LIB.getImageTexture(imgName), label.getX() - (getWidth() - label.getWidth()) / 2f, label.getY() - (getHeight() - label.getHeight()) / 2f, getWidth(), getHeight());
-            } else {
-                label.draw(_batch, _parentAlpha);
-            }
+            if (!isImage) label.draw(_batch, _parentAlpha);
         }
+    }
+
+    public boolean isHasImage() {
+        return isImage;
     }
 
     @Override
