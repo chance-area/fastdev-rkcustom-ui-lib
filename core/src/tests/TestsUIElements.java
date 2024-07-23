@@ -25,6 +25,8 @@ import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKButton;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKDropdownList;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKRadioBox;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKSpinner;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKTabPanelsManager;
 
@@ -57,6 +59,11 @@ public class TestsUIElements extends ApplicationAdapter {
     private RKButton buttonTwo;
     private RKSpinner spinnerOne;
     private RKSpinner spinnerTwo;
+
+    private RKDropdownList dropdownListOne;
+    private RKDropdownList dropdownListTwo;
+
+    private RKRadioBox radioBox;
 
     public TestsUIElements() {
         isDesktop = false;
@@ -129,6 +136,13 @@ public class TestsUIElements extends ApplicationAdapter {
         spinnerOne = rkCustomUILib.addSpinner("simple_spinner_1", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 400, 320, 52, 2f, 6f, 3);
         spinnerTwo = rkCustomUILib.addSpinner("simple_spinner_2", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 300, 320, 52, 2f, 6f, 3);
 
+        dropdownListOne = rkCustomUILib.addDropdownList("dropdown_list_1", GlobalColorsDark.DARK_COLOR_WHITE, 27, 600, 200, 240, 52, 2f, 6f, 3);
+        dropdownListOne.setElementsList(new String[]{"Элемент 1", "Элемент 2"});
+        dropdownListTwo = rkCustomUILib.addDropdownList("dropdown_list_2", GlobalColorsDark.DARK_COLOR_WHITE, 27, 600, 100, 240, 52, 2f, 6f, 3);
+        //dropdownListTwo.setElementsList(new String[]{"Элемент 1", "Элемент 2"});
+
+        radioBox = rkCustomUILib.addRadioBox("simple_radioBox", new String[]{"USB (Serial Port)", "Wi-Fi"}, GlobalColorsDark.DARK_COLOR_WHITE, 27, 620, 400, 3);
+
         // init and add tab panels managers
         tabPanelsManagerOne = rkCustomUILib.addTabPanelsManager("tab_panels_manager_1", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_1, 1);
         tabPanelsManagerTwo = rkCustomUILib.addTabPanelsManager("tab_panels_manager_2", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_2, 2);
@@ -147,7 +161,7 @@ public class TestsUIElements extends ApplicationAdapter {
         tabPanelsManagerOne.attachElementsToTabPanel("base_elements", new IRKUIElement[]{tabPanelsManagerTwo, buttonOne, buttonTwo, spinnerOne, spinnerTwo});
 
         // attach elements to mini tabPanelsManager (2)
-        tabPanelsManagerTwo.attachElementsToTabPanel("example_one", new String[]{nameLabelExampleOne});
+        tabPanelsManagerTwo.attachElementsToTabPanel("example_one", new String[]{nameLabelExampleOne, dropdownListOne.getName(), dropdownListTwo.getName(), radioBox.getName()});
         tabPanelsManagerTwo.attachElementsToTabPanel("example_two", new String[]{nameLabelExampleTwo});
 
         isUIElementsInit = true;
@@ -195,6 +209,14 @@ public class TestsUIElements extends ApplicationAdapter {
                 if (!buttonTwo.isInFocus()) {
                     buttonTwo.setFontColor(GlobalColorsDark.DARK_COLOR_WHITE);
                     buttonTwo.setText("Кнопка 2");
+                }
+
+                if (radioBox.getSelectedElementIndex() == 0) {
+                    dropdownListOne.setVisible(true);
+                    dropdownListTwo.setVisible(true);
+                } else {
+                    dropdownListOne.setVisible(false);
+                    dropdownListTwo.setVisible(false);
                 }
 
                 if (!rkCustomUILib.isLoadingLineVisible()) rkCustomUILib.hideLoadingLine();

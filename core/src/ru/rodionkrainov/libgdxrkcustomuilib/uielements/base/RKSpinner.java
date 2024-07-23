@@ -95,15 +95,20 @@ public class RKSpinner implements IRKUIElement {
             arrowImageUp.setPosition(arrowRectUp.getX() + (arrowRectUp.getWidth() - arrowImageUp.getWidth()) / 2f, arrowRectUp.getY() + (arrowRectUp.getHeight() - arrowImageUp.getHeight()) / 2f - 1.5f);
             arrowImageDown.setPosition(arrowRectDown.getX() + (arrowRectDown.getWidth() - arrowImageDown.getWidth()) / 2f, arrowRectDown.getY() + (arrowRectDown.getHeight() - arrowImageDown.getHeight()) / 2f + 1.5f);
 
+            arrowImageUp.setAlpha(0.7f);
+            arrowImageDown.setAlpha(0.7f);
             if (spinnerRect.isPointerHover() || spinnerLabel.isPointerHover() || arrowRectUp.isPointerHover() || arrowRectDown.isPointerHover()) {
                 LIB.changeCursor(Cursor.HAND_CURSOR);
 
-                if (_pointersStates[0][1]) {
-                    if (arrowRectUp.isPointerHover())        value += step;
-                    else if (arrowRectDown.isPointerHover()) value -= step;
-
-                    value = Math.max(Math.min(MathPlus.roundTo(value, 4), maxValue), minValue);
+                if (arrowRectUp.isPointerHover()) {
+                    arrowImageUp.setAlpha(1f);
+                    if (_pointersStates[0][1]) value += step;
+                }else if (arrowRectDown.isPointerHover()) {
+                    arrowImageDown.setAlpha(1f);
+                    if (_pointersStates[0][1]) value -= step;
                 }
+
+                value = Math.max(Math.min(MathPlus.roundTo(value, 4), maxValue), minValue);
             }
             if (isInFocus) {
                 borderColor = GlobalColorsDark.DARK_COLOR_SPINNER_FOCUS_BORDER;

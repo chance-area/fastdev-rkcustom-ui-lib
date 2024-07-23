@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.libgdxrkcustomuilib.utils.DrawingTools;
 
@@ -30,6 +31,9 @@ public class RKRect implements IRKUIElement {
     private boolean isRoundRadiusTopRight;
     private boolean isRoundRadiusBottomLeft;
     private boolean isRoundRadiusBottomRight;
+
+    private boolean isBorderDown = true;
+    private boolean isBorderUp   = true;
 
     private final Rectangle rectangle;
 
@@ -73,7 +77,8 @@ public class RKRect implements IRKUIElement {
                     _shapeRenderer.rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
 
                     _shapeRenderer.setColor(fillColor);
-                    _shapeRenderer.rect(rectangle.getX() + borderSize, rectangle.getY() + borderSize, rectangle.getWidth() - borderSize * 2f, rectangle.getHeight() - borderSize * 2f);
+                    if (isBorderDown && isBorderUp) _shapeRenderer.rect(rectangle.getX() + borderSize, rectangle.getY() + borderSize, rectangle.getWidth() - borderSize * 2f, rectangle.getHeight() - borderSize * 2f);
+                    else                            _shapeRenderer.rect(rectangle.getX() + borderSize, rectangle.getY(), rectangle.getWidth() - borderSize * 2f, rectangle.getHeight());
                 } else {
                     _shapeRenderer.rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
                 }
@@ -88,7 +93,10 @@ public class RKRect implements IRKUIElement {
                     drawRoundedRect(_shapeRenderer, posX, posY, width, height, roundRadius);
 
                     _shapeRenderer.setColor(fillColor);
-                    drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize * 2, (roundRadius - borderSize));
+                    if (isBorderDown && isBorderUp) drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize * 2, (roundRadius - borderSize));
+                    else if (isBorderDown)          drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize, (roundRadius - borderSize));
+                    else if (isBorderUp)            drawRoundedRect(_shapeRenderer, posX + borderSize, posY, width - borderSize * 2, height - borderSize, (roundRadius - borderSize));
+                    else                            drawRoundedRect(_shapeRenderer, posX + borderSize, posY, width - borderSize * 2, height, (roundRadius - borderSize));
                 } else {
                     drawRoundedRect(_shapeRenderer, posX, posY, width, height, roundRadius);
                 }
@@ -122,6 +130,20 @@ public class RKRect implements IRKUIElement {
             _shapeRenderer.rect(_posX + _width - _radius, _posY + _radius, _radius, _height - _radius * 2f);
             _shapeRenderer.arc(_posX + _width - _radius, _posY + _radius, _radius, 270f, 90f, arcSegments);
         } else _shapeRenderer.rect(_posX + _width - _radius, _posY, _radius, _height - _radius);
+    }
+
+    public void setIsRoundRadiusBottomLeft(boolean _isBoundRadiusBottomLeft) {
+        isRoundRadiusBottomLeft = _isBoundRadiusBottomLeft;
+    }
+    public void setIsRoundRadiusBottomRight(boolean _isBoundRadiusBottomRight) {
+        isRoundRadiusBottomRight = _isBoundRadiusBottomRight;
+    }
+
+    public void setIsBorderDown(boolean _isBorderDown) {
+        isBorderDown = _isBorderDown;
+    }
+    public void setIsBorderUp(boolean _isBorderUp) {
+        isBorderUp = _isBorderUp;
     }
 
     @Override

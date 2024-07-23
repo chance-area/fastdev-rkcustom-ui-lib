@@ -30,8 +30,10 @@ import javax.swing.JFrame;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.IButtonClickEvent;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKButton;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKDropdownList;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKImage;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKLabel;
+import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKRadioBox;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKRect;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKSpinner;
 import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKTabPanelsManager;
@@ -83,6 +85,8 @@ public class LibGdxRKCustomUILib extends Actor {
     private final ArrayList<RKButton>           arrRKButtons           = new ArrayList<>();
     private final ArrayList<RKImage>            arrRKImages            = new ArrayList<>();
     private final ArrayList<RKSpinner>          arrRKSpinners          = new ArrayList<>();
+    private final ArrayList<RKDropdownList>     arrRKDropdownLists     = new ArrayList<>();
+    private final ArrayList<RKRadioBox>         arrRKRadioBoxes        = new ArrayList<>();
 
     public LibGdxRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
         super();
@@ -384,6 +388,36 @@ public class LibGdxRKCustomUILib extends Actor {
         return addSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, 0, 0, _w, _h, _borderSize, _roundRadius, _zIndex, 0);
     }
 
+    // ---------- Dropdown lists ----------
+    public RKDropdownList addDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
+        if (isAllResLoaded) {
+            RKDropdownList rkDropdownList = new RKDropdownList(_name, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, _localZIndex, this);
+
+            arrRKDropdownLists.add(rkDropdownList);
+            addElement(rkDropdownList);
+            return rkDropdownList;
+        }
+        return null;
+    }
+    public RKDropdownList addDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
+        return addDropdownList(_name, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, 0);
+    }
+
+    // ---------- Radio Box ----------
+    public RKRadioBox addRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
+        if (isAllResLoaded) {
+            RKRadioBox rkRadioBox = new RKRadioBox(_name, _elements, _fontColor, _fontSize, _posX, _posY, _zIndex, _localZIndex, this);
+
+            arrRKRadioBoxes.add(rkRadioBox);
+            addElement(rkRadioBox);
+            return rkRadioBox;
+        }
+        return null;
+    }
+    public RKRadioBox addRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex) {
+        return addRadioBox(_name, _elements, _fontColor, _fontSize, _posX, _posY, _zIndex, 0);
+    }
+
 
     /* -------------------------------------------------------------------------------------
     --------------------------------- 'ELEMENTS' METHODS -----------------------------------
@@ -586,7 +620,7 @@ public class LibGdxRKCustomUILib extends Actor {
             for (int i = (arrRKUIElements.size() - 1); i >= 0; i--) {
                 IRKUIElement uiElement = arrRKUIElements.get(i);
 
-                if (uiElement.isVisible() && (uiElement.getType().equals("label") || uiElement.getType().equals("rect"))) {
+                if (uiElement.isVisible() && uiElement.getAlpha() > 0 && (uiElement.getType().equals("label") || uiElement.getType().equals("rect"))) {
                     if (checkStep.equals("hover")) {
                         Vector2 vMovePos = customClickListener.getVecPointerMovePosition();
                         isHasHover = (vMovePos.x >= uiElement.getX() && vMovePos.x <= uiElement.getX() + uiElement.getWidth() && vMovePos.y >= uiElement.getY() && vMovePos.y <= uiElement.getY() + uiElement.getHeight());
