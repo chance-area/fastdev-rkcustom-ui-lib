@@ -11,14 +11,22 @@
 
 package ru.rodionkrainov.fastdevrkcustomuilib;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.awt.Cursor;
 import java.util.ArrayList;
@@ -37,16 +45,29 @@ import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKRadioBox;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKRect;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKSpinner;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKTabPanelsManager;
-import ru.rodionkrainov.fastdevrkcustomuilib.utils.CustomClickListener;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.CustomInputProcessorUI;
 
-public class FastDevRKCustomUILib extends Actor {
+public final class FastDevRKCustomUILib {
     public static final String LIB_NAME    = "FastDevRKCustomUILib";
     public static final String LIB_VERSION = "0.4";
 
-    private boolean isAllResLoaded;
-    private boolean isCanShowUIElements;
-    private final boolean isShowLoadingLine;
-    private final AssetManager assetManager;
+    private static boolean IS_DESKTOP;
+    private static JFrame JFRAME;
+
+    private static Stage stageUILIb;
+    private static CustomInputProcessorUI customInputProcessorUI;
+
+    private static Batch batch;
+    private static ShapeRenderer shapeRenderer;
+
+    private static int windowWidth;
+    private static int windowHeight;
+
+    private static boolean isLibInit           = false;
+    private static boolean isAllResLoaded      = false;
+    private static boolean isCanShowUIElements = false;
+    private static boolean isShowLoadingLine   = true;
+    private static AssetManager assetManager;
 
     public enum DefaultImages {
         SETTINGS_ICON,
@@ -55,7 +76,7 @@ public class FastDevRKCustomUILib extends Actor {
         ARROW_UP,
         ARROW_DOWN
     }
-    private final String[][] DEFAULT_IMAGES_NAMES_PATH = new String[][] {
+    private static final String[][] DEFAULT_IMAGES_NAMES_PATH = new String[][] {
             {"defImg_settings_icon_defImg", "settings_256x256.png"},
             {"defImg_info_icon_defImg", "info_256x256.png"},
             {"defImg_help_icon_defImg", "help_256x256.png"},
@@ -63,117 +84,266 @@ public class FastDevRKCustomUILib extends Actor {
             {"defImg_arrow_down_defImg", "arrow_down_256x256.png"},
     };
 
-    private final boolean IS_DESKTOP;
-    private final JFrame JFRAME;
+    private static boolean isZIndexChanged = false;
 
-    private float windowWidth;
-    private float windowHeight;
+    // all UI elements (objects)
+    private static final ArrayList<IRKUIElement> arrRKUIElements = new ArrayList<>();
 
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
-
-    private boolean isZIndexChanged = false;
-
-    // for click / touch / drag events
-    private final CustomClickListener customClickListener;
-
-    // all elements
-    private final ArrayList<IRKUIElement> arrRKUIElements = new ArrayList<>();
-
-    private final ArrayList<RKLabel>            arrRKLabels            = new ArrayList<>();
-    private final ArrayList<RKRect>             arrRKRects             = new ArrayList<>();
-    private final ArrayList<RKTabPanelsManager> arrRKTabPanelsManagers = new ArrayList<>();
-    private final ArrayList<RKButton>           arrRKButtons           = new ArrayList<>();
-    private final ArrayList<RKImage>            arrRKImages            = new ArrayList<>();
-    private final ArrayList<RKSpinner>          arrRKSpinners          = new ArrayList<>();
-    private final ArrayList<RKDropdownList>     arrRKDropdownLists     = new ArrayList<>();
-    private final ArrayList<RKRadioBox>         arrRKRadioBoxes        = new ArrayList<>();
-
-    public FastDevRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
-        super();
-
-        windowWidth  = _windowWidth;
-        windowHeight = _windowHeight;
-
-        isShowLoadingLine = _isShowLoadingLine;
-
-        isAllResLoaded      = false;
-        isCanShowUIElements = false;
-        assetManager        = new AssetManager();
-
-        String[][] imagesNamesPath = new String[ (DEFAULT_IMAGES_NAMES_PATH.length + (_imagesNamesPath != null ? _imagesNamesPath.length : 0)) ][2];
-        for (int i = 0; i < imagesNamesPath.length; i++) {
-            if (i < DEFAULT_IMAGES_NAMES_PATH.length) imagesNamesPath[i] = DEFAULT_IMAGES_NAMES_PATH[i];
-            else if (_imagesNamesPath != null) imagesNamesPath[i] = _imagesNamesPath[ (i - DEFAULT_IMAGES_NAMES_PATH.length) ];
-        }
-
-        GlobalFontsManager.init(_fontFilePath, _fontBorderWidth, _fontSpaceX);
-        GlobalImagesManager.init(_pngFilesFolder, imagesNamesPath, assetManager);
-
-        if (!isShowLoadingLine) {
-            for (int i = 0; i < GlobalFontsManager.numBpFonts; i++) GlobalFontsManager.loadNext();
-            for (int i = 0; i < GlobalImagesManager.numImgTextures; i++) GlobalImagesManager.loadNext(assetManager);
-        }
-
-        IS_DESKTOP = _isDesktop;
-        JFRAME     = _jframe;
-
-        // 'unproject' camera already set
-        customClickListener = new CustomClickListener(_isDesktop);
-        this.setTouchable(Touchable.enabled);
-        this.addListener(customClickListener);
-    }
-    public FastDevRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
-        this(_fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, true, _windowWidth, _windowHeight, _isDesktop, _jframe);
+    private FastDevRKCustomUILib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine) {
+        /* ...ignore... */
     }
 
-    public void changeWindowSize(float _windowW, float _windowH) {
-        windowWidth  = _windowW;
-        windowHeight = _windowH;
-    }
+    public static void initLib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine) {
+        if (!isLibInit) {
+            stageUILIb = new Stage(_viewport);
+            stageUILIb.getRoot().addCaptureListener(new InputListener() {
+                @Override
+                public boolean touchDown (InputEvent _event, float _x, float _y, int _pointer, int _button) {
+                    _event.getStage().setKeyboardFocus(null);
+                    Gdx.input.setOnscreenKeyboardVisible(false);
 
-    public void changeCursor(int _cursor) {
-        if (IS_DESKTOP && JFRAME != null) {
-            JFRAME.setCursor(new Cursor(_cursor));
+                    return false;
+                }
+            });
+            _inputMultiplexer.addProcessor(stageUILIb);
+
+            customInputProcessorUI = new CustomInputProcessorUI(_isDesktop);
+            _inputMultiplexer.addProcessor(customInputProcessorUI);
+
+            batch         = new SpriteBatch();
+            shapeRenderer = new ShapeRenderer();
+
+            windowWidth  = _windowWidth;
+            windowHeight = _windowHeight;
+
+            IS_DESKTOP = _isDesktop;
+            JFRAME     = _jframe;
+
+            isAllResLoaded      = false;
+            isCanShowUIElements = false;
+            assetManager        = new AssetManager();
+
+            String[][] imagesNamesPath = new String[ (DEFAULT_IMAGES_NAMES_PATH.length + (_imagesNamesPath != null ? _imagesNamesPath.length : 0)) ][2];
+            for (int i = 0; i < imagesNamesPath.length; i++) {
+                if (i < DEFAULT_IMAGES_NAMES_PATH.length) imagesNamesPath[i] = DEFAULT_IMAGES_NAMES_PATH[i];
+                else if (_imagesNamesPath != null) imagesNamesPath[i] = _imagesNamesPath[ (i - DEFAULT_IMAGES_NAMES_PATH.length) ];
+            }
+
+            GlobalFontsManager.init(_fontFilePath, _fontBorderWidth, _fontSpaceX);
+            GlobalImagesManager.init(_pngFilesFolder, imagesNamesPath, assetManager);
+
+            isShowLoadingLine = _isShowLoadingLine;
+            if (!isShowLoadingLine) {
+                for (int i = 0; i < GlobalFontsManager.numBpFonts; i++) GlobalFontsManager.loadNext();
+                for (int i = 0; i < GlobalImagesManager.numImgTextures; i++) GlobalImagesManager.loadNext(assetManager);
+            }
+
+            isLibInit = true;
         }
     }
-
-    public boolean isAllResLoaded() {
-        return isAllResLoaded;
+    public static void initLib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, boolean _isShowLoadingLine) {
+        initLib(_viewport, _inputMultiplexer, _windowWidth, _windowHeight, _isDesktop, _jframe, _fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, _isShowLoadingLine);
+    }
+    public static void initLib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX) {
+        initLib(_viewport, _inputMultiplexer, _windowWidth, _windowHeight, _isDesktop, _jframe, _fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, true);
     }
 
-    public void hideLoadingLine() {
+
+    /* -------------------------------------------------------------------------------------
+    ------------------------------------ UPDATE && DRAW ------------------------------------
+    ---------------------------------------------------------------------------------------- */
+
+    public static void update(float _delta) {
+        if (isLibInit()) {
+            stageUILIb.getViewport().apply();
+            stageUILIb.getViewport().getCamera().update(true);
+            stageUILIb.act(_delta);
+
+            if (!isAllResLoaded()) {
+                if (isShowLoadingLine) {
+                    for (int i = 0; i < _delta / 10; i++) {
+                        GlobalFontsManager.loadNext();
+                        GlobalImagesManager.loadNext(assetManager);
+                    }
+                }
+
+                isAllResLoaded = (getLoadingPercent() == 100f);
+            } else if (isCanShowUIElements) {
+                //this.setBounds(0, 0, windowWidth, windowHeight);
+                customInputProcessorUI.update();
+
+                // sorting elements by zIndex (from least to most)
+                if (isZIndexChanged) {
+                    arrRKUIElements.sort(Comparator.comparingInt(IRKUIElement::getZIndex));
+                    isZIndexChanged = false;
+                }
+
+                // hover event (taking into account zIndex); check focus state
+                String checkStep = "hover"; // 'hover' or 'focus'
+                boolean isHasHover = false;
+                for (IRKUIElement uiElement : arrRKUIElements) uiElement.setIsPointerHover(false);
+                for (int i = (arrRKUIElements.size() - 1); i >= 0; i--) {
+                    IRKUIElement uiElement = arrRKUIElements.get(i);
+
+                    if (uiElement.isVisible() && uiElement.getAlpha() > 0 && (uiElement.getType().equals("label") || uiElement.getType().equals("rect"))) {
+                        if (checkStep.equals("hover")) {
+                            Vector2 vMovePos = customInputProcessorUI.getVecPointerMovePosition();
+                            isHasHover = (vMovePos.x >= uiElement.getX() && vMovePos.x <= uiElement.getX() + uiElement.getWidth() && vMovePos.y >= uiElement.getY() && vMovePos.y <= uiElement.getY() + uiElement.getHeight());
+
+                            if (isHasHover) {
+                                uiElement.setIsPointerHover(true);
+
+                                checkStep = "focus";
+                                i = arrRKUIElements.size(); // continue and reset 'i'
+                            }
+                        }
+
+                        // check focus (is hover and pointer down - element in focus)
+                        else {
+                            if (uiElement.isPointerHover() && customInputProcessorUI.getPointersStates(false)[0][0]) {
+                                for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
+
+                                uiElement.setIsInFocus(true);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!isHasHover && customInputProcessorUI.getPointersStates(false)[0][1]) for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
+
+                // update elements
+                boolean[][] pointersStates = customInputProcessorUI.getPointersStates();
+                for (IRKUIElement uiElement : arrRKUIElements) {
+                    if (uiElement.isVisible()) uiElement.update(_delta, pointersStates);
+                }
+            }
+        }
+    }
+
+    public static void draw() {
+        if (isLibInit()) {
+            if (Gdx.app.getGraphics().isGL30Available()) {
+                Gdx.gl30.glClearColor(GlobalColorsDark.DARK_COLOR_BG.r, GlobalColorsDark.DARK_COLOR_BG.g, GlobalColorsDark.DARK_COLOR_BG.b, GlobalColorsDark.DARK_COLOR_BG.a);
+                Gdx.gl30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL30.GL_COVERAGE_BUFFER_BIT_NV : 0));
+            } else {
+                Gdx.gl20.glClearColor(GlobalColorsDark.DARK_COLOR_BG.r, GlobalColorsDark.DARK_COLOR_BG.g, GlobalColorsDark.DARK_COLOR_BG.b, GlobalColorsDark.DARK_COLOR_BG.a);
+                Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
+            }
+            //stageUILIb.draw();
+
+            batch.setProjectionMatrix(stageUILIb.getViewport().getCamera().combined);
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+
+            if (isAllResLoaded && isCanShowUIElements) {
+                for (IRKUIElement uiElement : arrRKUIElements) {
+                    if (uiElement.isVisible() && uiElement.getX() < windowWidth && uiElement.getY() > -uiElement.getHeight()) {
+                        batch.begin();
+                        uiElement.draw(batch, shapeRenderer, 1f);
+                        batch.end();
+                    }
+                }
+            } else if (isShowLoadingLine) {
+                // draw loading line...
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+                shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_WHITE);
+                shapeRenderer.rectLine(128f, (windowHeight - 66f) / 2f, windowWidth - 128f, (windowHeight - 66f) / 2f, 8f);
+                shapeRenderer.rectLine(128f, (windowHeight - 66f) / 2f - 4f, 128f, (windowHeight - 66f) / 2f + 66f, 8f);
+                shapeRenderer.rectLine(124f, (windowHeight - 66f) / 2f + 66f, windowWidth - 128f, (windowHeight - 66f) / 2f + 66f, 8f);
+                shapeRenderer.rectLine(windowWidth - 128f, (windowHeight - 66f) / 2f + 70f, windowWidth - 128f, (windowHeight - 66f) / 2f - 4f, 8f);
+
+                shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_WHITE);
+                shapeRenderer.rect(128f + 10f, (windowHeight - 46f) / 2f, (windowWidth - (256f + 20f)) * (getLoadingPercent() / 100f), + 46f);
+                shapeRenderer.end();
+            }
+        }
+    }
+
+
+    /* ---------------------------------------------------------
+    --------------------- SETTERS / CHANGERS -------------------
+    ------------------------------------------------------------ */
+
+    public static void resizeWindow(int _newWindowWidth, int _newWindowHeight) {
+        if (isLibInit()) {
+            stageUILIb.getViewport().update(_newWindowWidth, _newWindowHeight, true);
+            stageUILIb.getViewport().getCamera().position.set(stageUILIb.getViewport().getWorldWidth() / 2f, stageUILIb.getCamera().viewportHeight / 2f, 0);
+
+            windowWidth  = _newWindowWidth;
+            windowHeight = _newWindowHeight;
+        }
+    }
+
+    public static void changeCursor(int _cursorType) {
+        if (isLibInit() && IS_DESKTOP && JFRAME != null) {
+            JFRAME.setCursor(new Cursor(_cursorType));
+        }
+    }
+
+    public static void hideLoadingLine() {
         isCanShowUIElements = true;
     }
 
-    public boolean isLoadingLineVisible() {
+
+    /* ---------------------------------------------------------
+    -------------------------- GETTERS -------------------------
+    ------------------------------------------------------------ */
+
+    public static int getWindowWidth() {
+        return windowWidth;
+    }
+
+    public static int getWindowHeight() {
+        return windowHeight;
+    }
+
+    public static boolean isLibInit() {
+        if (isLibInit) return true;
+        else {
+            Gdx.app.log(LIB_NAME + "_ERROR", "The library is not initialized! Use the \"initLib()\" method before you start.");
+            return false;
+        }
+    }
+
+    public static boolean isAllResLoaded() {
+        return isAllResLoaded;
+    }
+
+    public static boolean isLoadingLineVisible() {
         return isCanShowUIElements;
     }
 
-    public float getLoadingPercent() {
-        return (float) (GlobalFontsManager.numLoadedBpFonts + GlobalImagesManager.numLoadedImgTextures) / (GlobalFontsManager.numBpFonts + GlobalImagesManager.numImgTextures) * 100f;
+    public static float getLoadingPercent() {
+        if (isLibInit()) return (float) (GlobalFontsManager.numLoadedBpFonts + GlobalImagesManager.numLoadedImgTextures) / (GlobalFontsManager.numBpFonts + GlobalImagesManager.numImgTextures) * 100f;
+        return -1;
     }
 
-    public String getDefaultImageName(DefaultImages _defaultImgName) {
-        return DEFAULT_IMAGES_NAMES_PATH[ _defaultImgName.ordinal() ][0];
+    public static Stage getStage() {
+        return (isLibInit() ? stageUILIb : null);
     }
 
-    public boolean[][] getPointersStates() {
-        return customClickListener.getPointersStates(false);
+    public static String getDefaultImageName(DefaultImages _defaultImgName) {
+        return (isLibInit() ? DEFAULT_IMAGES_NAMES_PATH[ _defaultImgName.ordinal() ][0] : null);
     }
 
-    public boolean isDesktop() {
+    public static boolean[][] getPointersStates() {
+        return (isLibInit() ? customInputProcessorUI.getPointersStates(false) : null);
+    }
+
+    public static boolean isDesktop() {
         return IS_DESKTOP;
     }
 
-    public JFrame getJFrame() {
+    public static JFrame getJFrame() {
         return JFRAME;
     }
+
 
     /* -------------------------------------------------------------------------------------
     ---------------------- RECOURSES (Images, Models and ect) METHODS ----------------------
     ---------------------------------------------------------------------------------------- */
 
-    public Texture getImageTexture(String _imageName) {
+    public static Texture getImageTexture(String _imageName) {
         return (isAllResLoaded ? GlobalImagesManager.getImageTexture(_imageName, assetManager) : null);
     }
 
@@ -182,7 +352,7 @@ public class FastDevRKCustomUILib extends Actor {
     ------------------------------ 'ADD / REMOVE ELEMENTS' METHODS -------------------------
     ---------------------------------------------------------------------------------------- */
 
-    public void addElement(IRKUIElement _element) {
+    public static void addElement(IRKUIElement _element) {
         if (isAllResLoaded) {
             arrRKUIElements.add(_element);
             arrRKUIElements.sort(Comparator.comparingInt(IRKUIElement::getZIndex));
@@ -206,215 +376,168 @@ public class FastDevRKCustomUILib extends Actor {
         }
     }
 
-    public void removeElement(String _name) {
+    public static void removeElement(String _name) {
         if (isAllResLoaded) {
-            String elementType = "none";
-
             for (int i = 0; i < arrRKUIElements.size(); i++) {
                 if (arrRKUIElements.get(i).getName().equals(_name)) {
-                    elementType = arrRKUIElements.get(i).getType();
-
                     arrRKUIElements.remove(i);
                     break;
-                }
-            }
-
-            switch (elementType) {
-                case "label" -> {
-                    for (int i = 0; i < arrRKLabels.size(); i++) {
-                        if (arrRKLabels.get(i).getName().equals(_name)) {
-                            arrRKLabels.remove(i);
-                            break;
-                        }
-                    }
-                }
-                case "rect" -> {
-                    for (int i = 0; i < arrRKRects.size(); i++) {
-                        if (arrRKRects.get(i).getName().equals(_name)) {
-                            arrRKRects.remove(i);
-                            break;
-                        }
-                    }
-                }
-                case "tab_panels_manager" -> {
-                    for (int i = 0; i < arrRKTabPanelsManagers.size(); i++) {
-                        if (arrRKTabPanelsManagers.get(i).getName().equals(_name)) {
-                            arrRKTabPanelsManagers.remove(i);
-                            break;
-                        }
-                    }
-                }
-                case "button" -> {
-                    for (int i = 0; i < arrRKButtons.size(); i++) {
-                        if (arrRKButtons.get(i).getName().equals(_name)) {
-                            arrRKButtons.remove(i);
-                            break;
-                        }
-                    }
                 }
             }
         }
     }
 
     // ---- Label ----
-    public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
+    public static RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
-            RKLabel rkLabel = new RKLabel(_name, _text, _color, _fontSize, _posX, _posY, _zIndex, _localZIndex, this);
+            RKLabel rkLabel = new RKLabel(_name, _text, _color, _fontSize, _posX, _posY, _zIndex, _localZIndex);
 
-            arrRKLabels.add(rkLabel);
             addElement(rkLabel);
             return rkLabel;
         }
         return null;
     }
-    public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex) {
+    public static RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex) {
         return addLabel(_name, _text, _color, _fontSize, 0f, 0f, _zIndex, 0);
     }
-    public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY) {
+    public static RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY) {
         return addLabel(_name, _text, _color, _fontSize, 0f, 0f, 0, 0);
     }
-    public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, int _zIndex, int _localZIndex) {
+    public static RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, int _zIndex, int _localZIndex) {
         return addLabel(_name, _text, _color, _fontSize, 0f, 0f, _zIndex, _localZIndex);
     }
-    public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, int _zIndex) {
+    public static RKLabel addLabel(String _name, String _text, Color _color, int _fontSize, int _zIndex) {
         return addLabel(_name, _text, _color, _fontSize, 0f, 0f, _zIndex, 0);
     }
-    public RKLabel addLabel(String _name, String _text, Color _color, int _fontSize) {
+    public static RKLabel addLabel(String _name, String _text, Color _color, int _fontSize) {
         return addLabel(_name, _text, _color, _fontSize, 0f, 0f, 0, 0);
     }
 
     // ---- Rect ----
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, boolean _isRoundRadiusTopLeft, boolean _isRoundRadiusTopRight, boolean _isRoundRadiusBottomLeft, boolean _isRoundRadiusBottomRight, int _zIndex, int _localZIndex) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, boolean _isRoundRadiusTopLeft, boolean _isRoundRadiusTopRight, boolean _isRoundRadiusBottomLeft, boolean _isRoundRadiusBottomRight, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
             RKRect rkRect = new RKRect(_name, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, _isRoundRadiusTopLeft, _isRoundRadiusTopRight, _isRoundRadiusBottomLeft, _isRoundRadiusBottomRight, _zIndex, _localZIndex);
 
-            arrRKRects.add(rkRect);
             addElement(rkRect);
             return rkRect;
         }
         return null;
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, true, true, true, true, _zIndex, _localZIndex);
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, int _zIndex) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, int _zIndex) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, true, true, true, true, _zIndex, 0);
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, _roundRadius, true, true, true, true, 0, 0);
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, int _zIndex) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, int _zIndex) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, 0, false, false, false, false, _zIndex, 0);
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, int _zIndex) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, int _zIndex) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, null, -1, 0, false, false, false, false, _zIndex, 0);
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, int _zIndex, int _localZIndex) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, int _zIndex, int _localZIndex) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, null, -1, 0, false, false, false, false, _zIndex, _localZIndex);
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, _borderColor, _borderSize, 0, false, false, false, false, 0, 0);
     }
-    public RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor) {
+    public static RKRect addRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor) {
         return addRect(_name, _posX, _posY, _w, _h, _fillColor, null, -1, 0, false, false, false, false, 0, 0);
     }
 
     // ---- Tabs ----
-    public RKTabPanelsManager addTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex) {
+    public static RKTabPanelsManager addTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex) {
         if (isAllResLoaded) {
-            RKTabPanelsManager rkTabPanelsManager = new RKTabPanelsManager(_name, _posX, _posY, _labelFontSize, _panelsBgColor, _panelsBorderColor, _borderSize, _zIndex, 0, this);
+            RKTabPanelsManager rkTabPanelsManager = new RKTabPanelsManager(_name, _posX, _posY, _labelFontSize, _panelsBgColor, _panelsBorderColor, _borderSize, _zIndex, 0);
 
-            arrRKTabPanelsManagers.add(rkTabPanelsManager);
             addElement(rkTabPanelsManager);
             return rkTabPanelsManager;
         }
         return null;
     }
-    public RKTabPanelsManager addTabPanelsManager(String _name, int _labelFontSize, Color _panelsBgColor, int _zIndex) {
+    public static RKTabPanelsManager addTabPanelsManager(String _name, int _labelFontSize, Color _panelsBgColor, int _zIndex) {
         return addTabPanelsManager(_name, 0f, 0f, _labelFontSize, _panelsBgColor, null, -1, _zIndex);
     }
-    public RKTabPanelsManager addTabPanelsManager(String _name, int _labelFontSize, Color _panelsBgColor) {
+    public static RKTabPanelsManager addTabPanelsManager(String _name, int _labelFontSize, Color _panelsBgColor) {
         return addTabPanelsManager(_name, 0f, 0f, _labelFontSize, _panelsBgColor, null, -1, 0);
     }
 
     // -------- Buttons ---------
-    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex, int _localZIndex) {
+    public static RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
-            RKButton rkButton = new RKButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, _localZIndex, this);
+            RKButton rkButton = new RKButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, _localZIndex);
 
-            arrRKButtons.add(rkButton);
             addElement(rkButton);
             return rkButton;
         }
         return null;
     }
-    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
+    public static RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
         return addButton(_name, _text, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
     }
-    public RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
+    public static RKButton addButton(String _name, String _text, Color _fontColor, int _fontSize, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onClickButtonEvent, int _zIndex) {
         return addButton(_name, _text, _fontColor, _fontSize, 0, 0, _w, _h, _borderSize, _roundRadius, _onClickButtonEvent, _zIndex, 0);
     }
 
     // --------- Images ----------
-    public RKImage addImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex, int _localZIndex) {
+    public static RKImage addImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
-            RKImage rkImage = new RKImage(_name, _imgTextureName, _posX, _posY, _w, _h, _zIndex, _localZIndex, this);
+            RKImage rkImage = new RKImage(_name, _imgTextureName, _posX, _posY, _w, _h, _zIndex, _localZIndex);
 
-            arrRKImages.add(rkImage);
             addElement(rkImage);
             return rkImage;
         }
         return null;
     }
-    public RKImage addImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex) {
+    public static RKImage addImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex) {
         return addImage(_name, _imgTextureName, _posX, _posY, _w, _h, _zIndex, 0);
     }
 
     // -------- Spinners ---------
-    public RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
+    public static RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
-            RKSpinner rkSpinner = new RKSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, _localZIndex, this);
+            RKSpinner rkSpinner = new RKSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, _localZIndex);
 
-            arrRKSpinners.add(rkSpinner);
             addElement(rkSpinner);
             return rkSpinner;
         }
         return null;
     }
-    public RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
+    public static RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
         return addSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, 0);
     }
-    public RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
+    public static RKSpinner addSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
         return addSpinner(_name, _defNum, _min, _max, _step, _fontColor, _fontSize, 0, 0, _w, _h, _borderSize, _roundRadius, _zIndex, 0);
     }
 
     // ---------- Dropdown lists ----------
-    public RKDropdownList addDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
+    public static RKDropdownList addDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
-            RKDropdownList rkDropdownList = new RKDropdownList(_name, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, _localZIndex, this);
+            RKDropdownList rkDropdownList = new RKDropdownList(_name, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, _localZIndex);
 
-            arrRKDropdownLists.add(rkDropdownList);
             addElement(rkDropdownList);
             return rkDropdownList;
         }
         return null;
     }
-    public RKDropdownList addDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
+    public static RKDropdownList addDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex) {
         return addDropdownList(_name, _fontColor, _fontSize, _posX, _posY, _w, _h, _borderSize, _roundRadius, _zIndex, 0);
     }
 
     // ---------- Radio Box ----------
-    public RKRadioBox addRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
+    public static RKRadioBox addRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
         if (isAllResLoaded) {
-            RKRadioBox rkRadioBox = new RKRadioBox(_name, _elements, _fontColor, _fontSize, _posX, _posY, _zIndex, _localZIndex, this);
+            RKRadioBox rkRadioBox = new RKRadioBox(_name, _elements, _fontColor, _fontSize, _posX, _posY, _zIndex, _localZIndex);
 
-            arrRKRadioBoxes.add(rkRadioBox);
             addElement(rkRadioBox);
             return rkRadioBox;
         }
         return null;
     }
-    public RKRadioBox addRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex) {
+    public static RKRadioBox addRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex) {
         return addRadioBox(_name, _elements, _fontColor, _fontSize, _posX, _posY, _zIndex, 0);
     }
 
@@ -423,7 +546,7 @@ public class FastDevRKCustomUILib extends Actor {
     --------------------------------- 'ELEMENTS' METHODS -----------------------------------
     ---------------------------------------------------------------------------------------- */
 
-    private IRKUIElement foundAndGetElement(String _name) {
+    private static IRKUIElement foundAndGetElement(String _name) {
         if (isAllResLoaded) {
             for (int i = 0; i < arrRKUIElements.size(); i++) {
                 if (arrRKUIElements.get(i).getName().equals(_name)) return arrRKUIElements.get(i);
@@ -431,259 +554,151 @@ public class FastDevRKCustomUILib extends Actor {
         }
         return null;
     }
-    private RKLabel foundAndGetLabel(String _name) {
-        if (isAllResLoaded) {
-            for (int i = 0; i < arrRKLabels.size(); i++) {
-                if (arrRKLabels.get(i).getName().equals(_name)) return arrRKLabels.get(i);
-            }
-        }
+    private static RKLabel foundAndGetLabel(String _name) {
+        if (isAllResLoaded) return (RKLabel) foundAndGetElement(_name);
         return null;
     }
-    private RKRect foundAndGetRect(String _name) {
-        if (isAllResLoaded) {
-            for (int i = 0; i < arrRKRects.size(); i++) {
-                if (arrRKRects.get(i).getName().equals(_name)) return arrRKRects.get(i);
-            }
-        }
+    private static RKRect foundAndGetRect(String _name) {
+        if (isAllResLoaded) return (RKRect) foundAndGetElement(_name);
         return null;
     }
-    private RKTabPanelsManager foundAndGetTabPanelsManager(String _name) {
-        if (isAllResLoaded) {
-            for (int i = 0; i < arrRKTabPanelsManagers.size(); i++) {
-                if (arrRKTabPanelsManagers.get(i).getName().equals(_name)) return arrRKTabPanelsManagers.get(i);
-            }
-        }
+    private static RKTabPanelsManager foundAndGetTabPanelsManager(String _name) {
+        if (isAllResLoaded) return (RKTabPanelsManager) foundAndGetElement(_name);
         return null;
     }
-    private RKButton foundAndGetButton(String _name) {
-        if (isAllResLoaded) {
-            for (int i = 0; i < arrRKButtons.size(); i++) {
-                if (arrRKButtons.get(i).getName().equals(_name)) return arrRKButtons.get(i);
-            }
-        }
+    private static RKButton foundAndGetButton(String _name) {
+        if (isAllResLoaded) return (RKButton) foundAndGetElement(_name);
         return null;
     }
 
     // ### For All (setters) ###
-    public void setPosition(String _nameElement, float _x, float _y) {
+    public static void setPosition(String _nameElement, float _x, float _y) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setPosition(_x, _y);
     }
-    public void setX(String _nameElement, float _x) {
+    public static void setX(String _nameElement, float _x) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setX(_x);
     }
-    public void setY(String _nameElement, float _y) {
+    public static void setY(String _nameElement, float _y) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setY(_y);
     }
-    public void setSize(String _nameElement, float _w, float _h) {
+    public static void setSize(String _nameElement, float _w, float _h) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setSize(_w, _h);
     }
-    public void setWidth(String _nameElement, float _w) {
+    public static void setWidth(String _nameElement, float _w) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setWidth(_w);
     }
-    public void setHeight(String _nameElement, float _h) {
+    public static void setHeight(String _nameElement, float _h) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setHeight(_h);
     }
-    public void setFillColor(String _nameElement, Color _color) {
+    public static void setFillColor(String _nameElement, Color _color) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setFillColor(_color);
     }
-    public void setBorderColor(String _nameElement, Color _color) {
+    public static void setBorderColor(String _nameElement, Color _color) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setBorderColor(_color);
     }
-    public void setAlpha(String _nameElement, float _alpha) {
+    public static void setAlpha(String _nameElement, float _alpha) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setAlpha(_alpha);
     }
-    public void setLocalAlpha(String _nameElement, float _localAlpha) {
+    public static void setLocalAlpha(String _nameElement, float _localAlpha) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setLocalAlpha(_localAlpha);
     }
-    public void setVisible(String _nameElement, boolean _isVisible) {
+    public static void setVisible(String _nameElement, boolean _isVisible) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setVisible(_isVisible);
     }
-    public void setZIndex(String _nameElement, int _zIndex) {
+    public static void setZIndex(String _nameElement, int _zIndex) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setZIndex(_zIndex);
         isZIndexChanged = true;
     }
-    public void setIsInFocus(String _nameElement, boolean _isInFocus) {
+    public static void setIsInFocus(String _nameElement, boolean _isInFocus) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setIsInFocus(_isInFocus);
     }
 
     // ### For All (getters) ###
-    public String getType(String _nameElement) {
+    public static String getType(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getType();
     }
-    public Vector2 getPosition(String _nameElement) {
+    public static Vector2 getPosition(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getPosition();
     }
-    public float getX(String _nameElement) {
+    public static float getX(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getX();
     }
-    public float getY(String _nameElement) {
+    public static float getY(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getY();
     }
-    public Vector2 getSize(String _nameElement) {
+    public static Vector2 getSize(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getSize();
     }
-    public float getWidth(String _nameElement) {
+    public static float getWidth(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getWidth();
     }
-    public float getHeight(String _nameElement) {
+    public static float getHeight(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getHeight();
     }
-    public Color getFillColor(String _nameElement) {
+    public static Color getFillColor(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getFillColor();
     }
-    public Color getBorderColor(String _nameElement) {
+    public static Color getBorderColor(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getBorderColor();
     }
-    public float getAlpha(String _nameElement) {
+    public static float getAlpha(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getAlpha();
     }
-    public float getLocalAlpha(String _nameElement) {
+    public static float getLocalAlpha(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getLocalAlpha();
     }
-    public boolean isVisible(String _nameElement) {
+    public static boolean isVisible(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).isVisible();
     }
-    public boolean isPointerHover(String _nameElement) {
+    public static boolean isPointerHover(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).isPointerHover();
     }
-    public int getZIndex(String _nameElement) {
+    public static int getZIndex(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).getZIndex();
     }
-    public boolean isInFocus(String _nameElement) {
+    public static boolean isInFocus(String _nameElement) {
         return Objects.requireNonNull(foundAndGetElement(_nameElement)).isInFocus();
     }
 
     // ### Label (setters) ###
-    public void setLabelText(String _nameLabel, String _text) {
+    public static void setLabelText(String _nameLabel, String _text) {
         Objects.requireNonNull(foundAndGetLabel(_nameLabel)).setText(_text);
     }
 
     // ### Label (getters) ###
-    public String getLabelText(String _nameLabel) {
+    public static String getLabelText(String _nameLabel) {
         return Objects.requireNonNull(foundAndGetLabel(_nameLabel)).getText();
     }
 
-    public RKLabel getRKLabel(String _nameLabel) {
+    public static RKLabel getRKLabel(String _nameLabel) {
         return Objects.requireNonNull(foundAndGetLabel(_nameLabel));
     }
 
     // ### Rects (getters) ###
-    public RKRect getRKRect(String _nameRect) {
+    public static RKRect getRKRect(String _nameRect) {
         return Objects.requireNonNull(foundAndGetRect(_nameRect));
     }
 
     // ### Tabs (getters) ###
-    public RKTabPanelsManager getRKTabPanelsManager(String _nameTabPanelsManager) {
+    public static RKTabPanelsManager getRKTabPanelsManager(String _nameTabPanelsManager) {
         return foundAndGetTabPanelsManager(_nameTabPanelsManager);
     }
 
     // ### Buttons ###
-    public RKButton getRKButton(String _nameButton) {
+    public static RKButton getRKButton(String _nameButton) {
         return foundAndGetButton(_nameButton);
     }
 
 
-    /* -------------------------------------------------------------------------------------
-    ------------------------------------ UPDATE AND DRAW -----------------------------------
-    ---------------------------------------------------------------------------------------- */
+    public static void dispose() {
+        for (IRKUIElement uiElement : arrRKUIElements) uiElement.dispose();
+        for (Actor actor : stageUILIb.getActors()) actor.remove();
+        stageUILIb.dispose();
 
-    @Override
-    public void act(float _delta) {
-        super.act(_delta);
-
-        if (!isAllResLoaded()) {
-            if (isShowLoadingLine) {
-                for (int i = 0; i < _delta / 10; i++) {
-                    GlobalFontsManager.loadNext();
-                    GlobalImagesManager.loadNext(assetManager);
-                }
-            }
-
-            isAllResLoaded = (getLoadingPercent() == 100f);
-        } else if (isCanShowUIElements) {
-            this.setBounds(0, 0, windowWidth, windowHeight);
-            customClickListener.update();
-
-            // sorting elements by zIndex (from least to most)
-            if (isZIndexChanged) {
-                arrRKUIElements.sort(Comparator.comparingInt(IRKUIElement::getZIndex));
-                isZIndexChanged = false;
-            }
-
-            // hover event (taking into account zIndex); check focus state
-            String checkStep = "hover"; // 'hover' or 'focus'
-            boolean isHasHover = false;
-            for (IRKUIElement uiElement : arrRKUIElements) uiElement.setIsPointerHover(false);
-            for (int i = (arrRKUIElements.size() - 1); i >= 0; i--) {
-                IRKUIElement uiElement = arrRKUIElements.get(i);
-
-                if (uiElement.isVisible() && uiElement.getAlpha() > 0 && (uiElement.getType().equals("label") || uiElement.getType().equals("rect"))) {
-                    if (checkStep.equals("hover")) {
-                        Vector2 vMovePos = customClickListener.getVecPointerMovePosition();
-                        isHasHover = (vMovePos.x >= uiElement.getX() && vMovePos.x <= uiElement.getX() + uiElement.getWidth() && vMovePos.y >= uiElement.getY() && vMovePos.y <= uiElement.getY() + uiElement.getHeight());
-
-                        if (isHasHover) {
-                            uiElement.setIsPointerHover(true);
-
-                            checkStep = "focus";
-                            i = arrRKUIElements.size(); // continue and reset 'i'
-                        }
-                    }
-
-                    // check focus (is hover and pointer down - element in focus)
-                    else {
-                        if (uiElement.isPointerHover() && customClickListener.getPointersStates(false)[0][0]) {
-                            for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
-
-                            uiElement.setIsInFocus(true);
-                            break;
-                        }
-                    }
-                }
-            }
-            if (!isHasHover && customClickListener.getPointersStates(false)[0][1]) for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
-
-            // update elements
-            boolean[][] pointersStates = customClickListener.getPointersStates();
-            for (IRKUIElement uiElement : arrRKUIElements) {
-                if (uiElement.isVisible()) uiElement.update(_delta, pointersStates);
-            }
-        }
-    }
-
-    @Override
-    public void draw(Batch _batch, float _parentAlpha) {
-        super.draw(_batch, _parentAlpha);
-
-        shapeRenderer.setProjectionMatrix(_batch.getProjectionMatrix());
-
-        if (isAllResLoaded && isCanShowUIElements) {
-            for (IRKUIElement uiElement : arrRKUIElements) {
-                if (uiElement.isVisible() && uiElement.getX() < windowWidth && uiElement.getY() > -uiElement.getHeight())
-                    uiElement.draw(_batch, shapeRenderer, _parentAlpha);
-            }
-        } else if (isShowLoadingLine) {
-            // draw loading line...
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-            shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_WHITE);
-            shapeRenderer.rectLine(128f, (windowHeight - 66f) / 2f, windowWidth - 128f, (windowHeight - 66f) / 2f, 8f);
-            shapeRenderer.rectLine(128f, (windowHeight - 66f) / 2f - 4f, 128f, (windowHeight - 66f) / 2f + 66f, 8f);
-            shapeRenderer.rectLine(124f, (windowHeight - 66f) / 2f + 66f, windowWidth - 128f, (windowHeight - 66f) / 2f + 66f, 8f);
-            shapeRenderer.rectLine(windowWidth - 128f, (windowHeight - 66f) / 2f + 70f, windowWidth - 128f, (windowHeight - 66f) / 2f - 4f, 8f);
-
-            shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_WHITE);
-            shapeRenderer.rect(128f + 10f, (windowHeight - 46f) / 2f, (windowWidth - (256f + 20f)) * (getLoadingPercent() / 100f), + 46f);
-            shapeRenderer.end();
-        }
-    }
-
-    public void dispose() {
         shapeRenderer.dispose();
 
-        for (IRKUIElement uiElement : arrRKUIElements) uiElement.dispose();
         GlobalFontsManager.dispose();
+        GlobalImagesManager.dispose();
         assetManager.dispose();
-        this.remove();
     }
 }

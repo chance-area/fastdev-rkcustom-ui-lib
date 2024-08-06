@@ -54,4 +54,8 @@ public abstract class GlobalImagesManager {
 
         return (imageIndex != -1 ? _assetManager.get(arrImgTextures.get(imageIndex)) : null);
     }
+
+    public static void dispose() {
+        // TODO
+    }
 }

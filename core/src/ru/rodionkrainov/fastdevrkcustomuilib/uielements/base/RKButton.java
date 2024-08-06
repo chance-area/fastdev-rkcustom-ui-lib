@@ -27,13 +27,12 @@ public class RKButton implements IRKUIElement {
     private float localAlpha = 1f;
     private float borderSize;
 
-    private final FastDevRKCustomUILib LIB;
     private final IButtonClickEvent onButtonClickEvent;
 
     private final RKRect buttonRect;
     private final RKLabel buttonLabel;
 
-    public RKButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onButtonClickEvent, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
+    public RKButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onButtonClickEvent, int _zIndex, int _localZIndex) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -43,11 +42,10 @@ public class RKButton implements IRKUIElement {
         borderColor = GlobalColorsDark.DARK_COLOR_BUTTON_BORDER.cpy();
         borderSize  = _borderSize;
 
-        LIB = _lib;
         onButtonClickEvent = _onButtonClickEvent;
 
-        buttonRect  = LIB.addRect("button_" + _name + "_rect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, _roundRadius, _zIndex, localZIndex);
-        buttonLabel = LIB.addLabel("button_" + _name + "_label", _text, fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 1);
+        buttonRect  = FastDevRKCustomUILib.addRect("button_" + _name + "_rect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, _roundRadius, _zIndex, localZIndex);
+        buttonLabel = FastDevRKCustomUILib.addLabel("button_" + _name + "_label", _text, fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 1);
     }
 
     @Override
@@ -63,7 +61,7 @@ public class RKButton implements IRKUIElement {
             buttonLabel.setPosition(buttonRect.getX() + (buttonRect.getWidth() - buttonLabel.getWidth()) / 2f, buttonRect.getY() + (buttonRect.getHeight() - buttonLabel.getHeight()) / 2f);
 
             if (buttonRect.isPointerHover() || buttonLabel.isPointerHover()) {
-                LIB.changeCursor(Cursor.HAND_CURSOR);
+                FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
 
                 fillColor   = GlobalColorsDark.DARK_COLOR_BUTTON_HOVER;
                 borderColor = GlobalColorsDark.DARK_COLOR_BUTTON_HOVER_BORDER;
@@ -105,11 +103,6 @@ public class RKButton implements IRKUIElement {
     @Override
     public boolean isPointerHover() {
         return isPointerHover;
-    }
-
-    @Override
-    public void setName(String _name) {
-        name = _name;
     }
 
     public void setText(String _text) {

@@ -165,11 +165,6 @@ public class RKRect implements IRKUIElement {
     }
 
     @Override
-    public void setName(String _name) {
-        name = _name;
-    }
-
-    @Override
     public void setPosition(float _x, float _y) {
         rectangle.setPosition(_x, _y);
     }

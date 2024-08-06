@@ -19,8 +19,6 @@ public class RKLabel implements IRKUIElement {
     private boolean isPointerHover = false;
     private boolean isInFocus = false;
 
-    private final FastDevRKCustomUILib LIB;
-
     private Color fillColor;
     private Color borderColor;
     private float alpha      = 1f;
@@ -32,12 +30,10 @@ public class RKLabel implements IRKUIElement {
     private final int fontSize;
     private final Label label;
 
-    public RKLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
+    public RKLabel(String _name, String _text, Color _color, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
-
-        LIB = _lib;
 
         fillColor   = _color.cpy();
         borderColor = new Color(0, 0, 0, alpha);
@@ -60,7 +56,7 @@ public class RKLabel implements IRKUIElement {
         isImage = _text.contains("%#img_") && _text.contains("#%");
         if (isImage) {
             String imgTextureName = _text.substring(_text.indexOf("%#img_") + 6, _text.indexOf("#%"));
-            image = LIB.addImage("label_" + name + "_img", imgTextureName, 0, 0, 0, 0, zIndex, localZIndex + 1);
+            image = FastDevRKCustomUILib.addImage("label_" + name + "_img", imgTextureName, 0, 0, 0, 0, zIndex, localZIndex + 1);
         }
     }
 
@@ -111,11 +107,6 @@ public class RKLabel implements IRKUIElement {
     @Override
     public boolean isPointerHover() {
         return isPointerHover;
-    }
-
-    @Override
-    public void setName(String _name) {
-        name = _name;
     }
 
     public void setText(String _text) {

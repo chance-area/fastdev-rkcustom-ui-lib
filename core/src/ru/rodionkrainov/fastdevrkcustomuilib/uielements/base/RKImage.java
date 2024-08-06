@@ -19,23 +19,19 @@ public class RKImage implements IRKUIElement {
     private String imgTextureName;
     private Color fillColor = new Color(0, 0, 0, 1f);
 
-    private final FastDevRKCustomUILib LIB;
-
     private final Vector2 position = new Vector2(-1, -1);
     private final Vector2 size = new Vector2(-1, -1);
 
     private float alpha      = 1f;
     private float localAlpha = 1f;
 
-    public RKImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
+    public RKImage(String _name, String _imgTextureName, float _posX, float _posY, float _w, float _h, int _zIndex, int _localZIndex) {
         name = _name;
         imgTextureName = _imgTextureName;
         position.set(_posX, _posY);
         size.set(_w, _h);
         zIndex = _zIndex;
         localZIndex = _localZIndex;
-
-        LIB = _lib;
     }
 
     @Override
@@ -47,7 +43,7 @@ public class RKImage implements IRKUIElement {
     public void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha) {
         Color batchColor = _batch.getColor();
         _batch.setColor(batchColor.r, batchColor.g, batchColor.b, fillColor.a);
-        _batch.draw(LIB.getImageTexture(imgTextureName), position.x, position.y, size.x, size.y);
+        _batch.draw(FastDevRKCustomUILib.getImageTexture(imgTextureName), position.x, position.y, size.x, size.y);
     }
 
     @Override
@@ -68,11 +64,6 @@ public class RKImage implements IRKUIElement {
     @Override
     public boolean isPointerHover() {
         return isPointerHover;
-    }
-
-    @Override
-    public void setName(String _name) {
-        name = _name;
     }
 
     @Override

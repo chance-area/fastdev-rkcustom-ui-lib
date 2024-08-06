@@ -28,8 +28,6 @@ public class RKSpinner implements IRKUIElement {
     private float localAlpha = 1f;
     private float borderSize;
 
-    private final FastDevRKCustomUILib LIB;
-
     private final RKRect spinnerRect;
     private final RKLabel spinnerLabel;
 
@@ -44,7 +42,7 @@ public class RKSpinner implements IRKUIElement {
     private float maxValue;
     private float step;
 
-    public RKSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
+    public RKSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -55,21 +53,19 @@ public class RKSpinner implements IRKUIElement {
         borderSize  = _borderSize;
         arrowsButtonsWidth = _h / 1.9f;
 
-        LIB = _lib;
-
         value    = _defNum;
         minValue = _min;
         maxValue = _max;
         step     = _step;
 
-        spinnerRect  = LIB.addRect("spinner_" + _name + "_rect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, _roundRadius, _zIndex, localZIndex);
-        spinnerLabel = LIB.addLabel("spinner_" + _name + "_label", String.valueOf(value), fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 1);
+        spinnerRect  = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, _roundRadius, _zIndex, localZIndex);
+        spinnerLabel = FastDevRKCustomUILib.addLabel("spinner_" + _name + "_label", String.valueOf(value), fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 1);
 
-        arrowRectUp   = LIB.addRect("spinner_" + _name + "_rectArrowUp", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, true, false, false, _zIndex, localZIndex + 1);
-        arrowRectDown = LIB.addRect("spinner_" + _name + "_rectArrowDown", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, false, false, true, _zIndex,  + 1);
+        arrowRectUp   = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rectArrowUp", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, true, false, false, _zIndex, localZIndex + 1);
+        arrowRectDown = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rectArrowDown", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, false, false, true, _zIndex,  + 1);
 
-        arrowImageUp   = LIB.addImage("spinner_" + _name + "_imageArrowUp", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 2);
-        arrowImageDown = LIB.addImage("spinner_" + _name + "_imageArrowDown", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 2);
+        arrowImageUp   = FastDevRKCustomUILib.addImage("spinner_" + _name + "_imageArrowUp", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 2);
+        arrowImageDown = FastDevRKCustomUILib.addImage("spinner_" + _name + "_imageArrowDown", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 2);
     }
 
     @Override
@@ -98,7 +94,7 @@ public class RKSpinner implements IRKUIElement {
             arrowImageUp.setAlpha(0.7f);
             arrowImageDown.setAlpha(0.7f);
             if (spinnerRect.isPointerHover() || spinnerLabel.isPointerHover() || arrowRectUp.isPointerHover() || arrowRectDown.isPointerHover()) {
-                LIB.changeCursor(Cursor.HAND_CURSOR);
+                FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
 
                 if (arrowRectUp.isPointerHover()) {
                     arrowImageUp.setAlpha(1f);
@@ -164,11 +160,6 @@ public class RKSpinner implements IRKUIElement {
     @Override
     public boolean isPointerHover() {
         return isPointerHover;
-    }
-
-    @Override
-    public void setName(String _name) {
-        name = _name;
     }
 
     @Override

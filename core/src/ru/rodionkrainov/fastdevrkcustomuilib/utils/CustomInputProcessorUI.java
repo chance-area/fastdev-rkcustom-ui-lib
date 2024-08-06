@@ -1,12 +1,14 @@
 package ru.rodionkrainov.fastdevrkcustomuilib.utils;
 
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.Arrays;
 
-public class CustomClickListener extends ClickListener {
+import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
+
+public class CustomInputProcessorUI implements InputProcessor {
     private final boolean isDesktop;
 
     private int numIterationsToResetDownVPos = -1; // only for mobile (android and ios)
@@ -17,25 +19,47 @@ public class CustomClickListener extends ClickListener {
     private final Vector2 vPointerDraggedPosition = new Vector2(-1, -1);
     private final Vector2 vPointerMovePosition    = new Vector2(-1, -1);
 
-    public CustomClickListener(boolean _isDesktop) {
+    public CustomInputProcessorUI(boolean _isDesktop) {
         isDesktop = _isDesktop;
     }
 
+    public static Vector3 unproject(float _x, float _y) {
+        if (FastDevRKCustomUILib.isLibInit()) return FastDevRKCustomUILib.getStage().getCamera().unproject(new Vector3(_x, _y, 0));
+        else return new Vector3(-1, -1, -1);
+    }
+
     @Override
-    public boolean touchDown(InputEvent _event, float _x, float _y, int _pointer, int _button) {
-        vPointerDownPosition.set(_x, _y);
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int _screenX, int _screenY, int _pointer, int button) {
+        Vector3 unprojectV = unproject(_screenX, _screenY);
+        vPointerDownPosition.set(unprojectV.x, unprojectV.y);
 
         vPointerUpPosition.set(-1, -1);
         vPointerDraggedPosition.set(-1, -1);
 
         if (_pointer < pointersStates.length) pointersStates[_pointer][0] = true; // is down
 
-        return super.touchDown(_event, _x, _y, _pointer, _button);
+        return false;
     }
 
     @Override
-    public void touchUp(InputEvent _event, float _x, float _y, int _pointer, int _button) {
-        vPointerUpPosition.set(_x, _y);
+    public boolean touchUp(int _screenX, int _screenY, int _pointer, int button) {
+        Vector3 unprojectV = unproject(_screenX, _screenY);
+        vPointerUpPosition.set(unprojectV.x, unprojectV.y);
 
         if (isDesktop) vPointerDownPosition.set(-1, -1);
         else numIterationsToResetDownVPos = 1;
@@ -43,25 +67,37 @@ public class CustomClickListener extends ClickListener {
 
         if (_pointer < pointersStates.length) pointersStates[_pointer][1] = true; // is up
 
-        super.touchUp(_event, _x, _y, _pointer, _button);
+        return false;
     }
 
     @Override
-    public void touchDragged(InputEvent _event, float _x, float _y, int _pointer) {
-        vPointerDraggedPosition.set(_x, _y);
+    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int _screenX, int _screenY, int _pointer) {
+        Vector3 unprojectV = unproject(_screenX, _screenY);
+        vPointerDraggedPosition.set(unprojectV.x, unprojectV.y);
 
         vPointerUpPosition.set(-1, -1);
         vPointerMovePosition.set(vPointerDraggedPosition);
 
         if (_pointer < pointersStates.length) pointersStates[_pointer][2] = true; // is dragged
 
-        super.touchDragged(_event, _x, _y, _pointer);
+        return false;
     }
 
     @Override
-    public boolean mouseMoved(InputEvent _event, float _x, float _y) {
-        if (isDesktop && vPointerDraggedPosition.x == -1 && vPointerDraggedPosition.y == -1) vPointerMovePosition.set(_x, _y);
-        return super.mouseMoved(_event, _x, _y);
+    public boolean mouseMoved(int _screenX, int _screenY) {
+        Vector3 unprojectV = unproject(_screenX, _screenY);
+        if (isDesktop && vPointerDraggedPosition.x == -1 && vPointerDraggedPosition.y == -1) vPointerMovePosition.set(unprojectV.x, unprojectV.y);
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
     }
 
 

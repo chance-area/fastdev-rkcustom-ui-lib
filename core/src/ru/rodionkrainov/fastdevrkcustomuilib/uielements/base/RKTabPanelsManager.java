@@ -29,7 +29,6 @@ public class RKTabPanelsManager implements IRKUIElement {
     private float alpha      = 1f;
     private float localAlpha = 1f;
 
-    private final FastDevRKCustomUILib LIB;
     private final ShapeRenderer shapeRenderer;
 
     private final Vector2 position;
@@ -53,7 +52,7 @@ public class RKTabPanelsManager implements IRKUIElement {
     private boolean isSelectedTabChanged = false;
     private final ArrayList<ArrayList<String>> arrTabs = new ArrayList<>();
 
-    public RKTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
+    public RKTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex, int _localZIndex) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -63,7 +62,6 @@ public class RKTabPanelsManager implements IRKUIElement {
         borderSize  = _borderSize;
 
         LABEL_FONT_SIZE = _labelFontSize;
-        LIB             = _lib;
 
         position = new Vector2(_posX, _posY);
         size     = new Vector2(-1, -1);
@@ -75,15 +73,15 @@ public class RKTabPanelsManager implements IRKUIElement {
         String labelName = "tabManager_" + name + "_tab_" + "-" + _tabName + "_tabLabel_" + arrTabs.size();
         String rectName  = "tabManager_" + name + "_tab_" + "-" + _tabName + "_tabRect_" + arrTabs.size();
 
-        LIB.addLabel(labelName, _tabTitle, GlobalColorsDark.DARK_COLOR_TABBED_TEXT, LABEL_FONT_SIZE, zIndex, (localZIndex - 1));
-        LIB.addRect(rectName, -1, -1, 0, 0, GlobalColorsDark.DARK_COLOR_TABS, zIndex, (localZIndex - 2));
+        FastDevRKCustomUILib.addLabel(labelName, _tabTitle, GlobalColorsDark.DARK_COLOR_TABBED_TEXT, LABEL_FONT_SIZE, zIndex, (localZIndex - 1));
+        FastDevRKCustomUILib.addRect(rectName, -1, -1, 0, 0, GlobalColorsDark.DARK_COLOR_TABS, zIndex, (localZIndex - 2));
 
-        LIB.setVisible(labelName, isVisible);
-        LIB.setVisible(rectName, isVisible);
+        FastDevRKCustomUILib.setVisible(labelName, isVisible);
+        FastDevRKCustomUILib.setVisible(rectName, isVisible);
 
         arrTabs.add(new ArrayList<>(Arrays.asList(labelName, rectName, _tabName, _tabTitle, (_tabRectAlign == 1 ? "right" : "left"))));
 
-        tabHeight = LIB.getSize(labelName).y + TABS_TITLES_PADDING_UB * 2 + LINE_HEIGHT;
+        tabHeight = FastDevRKCustomUILib.getSize(labelName).y + TABS_TITLES_PADDING_UB * 2 + LINE_HEIGHT;
         if (selectedTabName.isEmpty()) {
             selectedTabName         = _tabName;
             previousSelectedTabName = _tabName;
@@ -98,7 +96,7 @@ public class RKTabPanelsManager implements IRKUIElement {
             if (arrTabs.get(i).get(2).equals(_tabNameToAttach)) {
                 for (String attachElementName : _attachElementsNames) {
                     arrTabs.get(i).add(attachElementName);
-                    LIB.setVisible(attachElementName, isVisible);
+                    FastDevRKCustomUILib.setVisible(attachElementName, isVisible);
                 }
             }
         }
@@ -142,31 +140,31 @@ public class RKTabPanelsManager implements IRKUIElement {
                 String labelName = arrTabs.get(i).get(0);
                 String rectName  = arrTabs.get(i).get(1);
 
-                LIB.setZIndex(labelName, zIndex);
-                LIB.setZIndex(rectName, zIndex);
+                FastDevRKCustomUILib.setZIndex(labelName, zIndex);
+                FastDevRKCustomUILib.setZIndex(rectName, zIndex);
 
-                float tabRectWidth = LIB.getSize(labelName).x + TABS_TITLES_PADDING_LR * 2 - (LIB.getRKLabel(labelName).isHasImage() ? TABS_TITLES_PADDING_LR * 1.4f : 0);
+                float tabRectWidth = FastDevRKCustomUILib.getSize(labelName).x + TABS_TITLES_PADDING_LR * 2 - (FastDevRKCustomUILib.getRKLabel(labelName).isHasImage() ? TABS_TITLES_PADDING_LR * 1.4f : 0);
                 float tabRectX     = getPosition().x + (arrTabs.get(i).get(4).equals("left") ? (i > 0 ? (SPACE_BETWEEN_TABS + sumWidthLeft) : 0) : (getSize().x - tabRectWidth) - (i > 0 ? (SPACE_BETWEEN_TABS + sumWidthRight) : 0));
                 float tabRectY     = getPosition().y + getHeight() + LINE_HEIGHT;
 
-                LIB.setPosition(rectName, tabRectX, tabRectY);
-                LIB.setSize(rectName, tabRectWidth, tabHeight - LINE_HEIGHT);
-                LIB.setPosition(labelName, tabRectX + (tabRectWidth - LIB.getSize(labelName).x) / 2f, tabRectY + (tabHeight - LINE_HEIGHT - LIB.getSize(labelName).y) / 2f);
+                FastDevRKCustomUILib.setPosition(rectName, tabRectX, tabRectY);
+                FastDevRKCustomUILib.setSize(rectName, tabRectWidth, tabHeight - LINE_HEIGHT);
+                FastDevRKCustomUILib.setPosition(labelName, tabRectX + (tabRectWidth - FastDevRKCustomUILib.getSize(labelName).x) / 2f, tabRectY + (tabHeight - LINE_HEIGHT - FastDevRKCustomUILib.getSize(labelName).y) / 2f);
 
                 if (arrTabs.get(i).get(4).equals("left")) sumWidthLeft += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
                 else sumWidthRight += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
 
                 // hover and click events
-                if (LIB.isPointerHover(labelName) || LIB.isPointerHover(rectName)) {
-                    LIB.changeCursor(Cursor.HAND_CURSOR);
-                    LIB.setFillColor(rectName, GlobalColorsDark.DARK_COLOR_TAB_HOVER);
+                if (FastDevRKCustomUILib.isPointerHover(labelName) || FastDevRKCustomUILib.isPointerHover(rectName)) {
+                    FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
+                    FastDevRKCustomUILib.setFillColor(rectName, GlobalColorsDark.DARK_COLOR_TAB_HOVER);
 
                     if (_pointersStates[0][1]) {
                         setSelectedTab(arrTabs.get(i).get(2));
                         isSelectTabClick = true;
                     }
                 } else {
-                    LIB.setFillColor(rectName, GlobalColorsDark.DARK_COLOR_TABS);
+                    FastDevRKCustomUILib.setFillColor(rectName, GlobalColorsDark.DARK_COLOR_TABS);
                 }
             }
             tabsWidthSum = sumWidthLeft;
@@ -185,7 +183,7 @@ public class RKTabPanelsManager implements IRKUIElement {
 
                         for (int j = 5; j < arrTabs.get(i).size(); j++) {
                             String elementName = arrTabs.get(i).get(j);
-                            LIB.setLocalAlpha(elementName, (isElementsVisible ? LIB.getAlpha(elementName) : 0f));
+                            FastDevRKCustomUILib.setLocalAlpha(elementName, (isElementsVisible ? FastDevRKCustomUILib.getAlpha(elementName) : 0f));
                         }
                     }
                 }
@@ -226,10 +224,10 @@ public class RKTabPanelsManager implements IRKUIElement {
                 }
                 if (selectedRectName != null) {
                     shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_TAB_SELECTED_LINE.r, GlobalColorsDark.DARK_COLOR_TAB_SELECTED_LINE.g, GlobalColorsDark.DARK_COLOR_TAB_SELECTED_LINE.b, Math.min(alpha, localAlpha));
-                    shapeRenderer.rect(LIB.getX(selectedRectName), LIB.getY(selectedRectName) - LINE_HEIGHT, LIB.getWidth(selectedRectName), LINE_HEIGHT * LINE_HEIGHT_KOF - lineHeight_animationY);
+                    shapeRenderer.rect(FastDevRKCustomUILib.getX(selectedRectName), FastDevRKCustomUILib.getY(selectedRectName) - LINE_HEIGHT, FastDevRKCustomUILib.getWidth(selectedRectName), LINE_HEIGHT * LINE_HEIGHT_KOF - lineHeight_animationY);
 
                     // for line animation
-                    if (previousRectName != null) shapeRenderer.rect(LIB.getX(previousRectName), LIB.getY(previousRectName) - LINE_HEIGHT, LIB.getWidth(previousRectName), lineHeight_animationY);
+                    if (previousRectName != null) shapeRenderer.rect(FastDevRKCustomUILib.getX(previousRectName), FastDevRKCustomUILib.getY(previousRectName) - LINE_HEIGHT, FastDevRKCustomUILib.getWidth(previousRectName), lineHeight_animationY);
                 }
 
                 shapeRenderer.end();
@@ -245,12 +243,12 @@ public class RKTabPanelsManager implements IRKUIElement {
         isSelectedTabChanged = true;
 
         for (int i = 0; i < arrTabs.size(); i++) {
-            LIB.setVisible(arrTabs.get(i).get(0), _isVisible);
-            LIB.setVisible(arrTabs.get(i).get(1), _isVisible);
+            FastDevRKCustomUILib.setVisible(arrTabs.get(i).get(0), _isVisible);
+            FastDevRKCustomUILib.setVisible(arrTabs.get(i).get(1), _isVisible);
 
             if (arrTabs.get(i).size() > 5) {
                 for (int j = 5; j < arrTabs.get(i).size(); j++) {
-                    LIB.setVisible(arrTabs.get(i).get(j), _isVisible);
+                    FastDevRKCustomUILib.setVisible(arrTabs.get(i).get(j), _isVisible);
                 }
             }
         }
@@ -273,11 +271,6 @@ public class RKTabPanelsManager implements IRKUIElement {
     @Override
     public boolean isPointerHover() {
         return isPointerHover;
-    }
-
-    @Override
-    public void setName(String _name) {
-        name = _name;
     }
 
     @Override
@@ -325,12 +318,12 @@ public class RKTabPanelsManager implements IRKUIElement {
         alpha = _alpha;
 
         for (int i = 0; i < arrTabs.size(); i++) {
-            LIB.setAlpha(arrTabs.get(i).get(0), alpha);
-            LIB.setAlpha(arrTabs.get(i).get(1), alpha);
+            FastDevRKCustomUILib.setAlpha(arrTabs.get(i).get(0), alpha);
+            FastDevRKCustomUILib.setAlpha(arrTabs.get(i).get(1), alpha);
 
             if (arrTabs.get(i).size() > 5) {
                 for (int j = 5; j < arrTabs.get(i).size(); j++) {
-                    LIB.setAlpha(arrTabs.get(i).get(j), alpha);
+                    FastDevRKCustomUILib.setAlpha(arrTabs.get(i).get(j), alpha);
                 }
             }
         }
@@ -342,12 +335,12 @@ public class RKTabPanelsManager implements IRKUIElement {
         isSelectedTabChanged = true;
 
         for (int i = 0; i < arrTabs.size(); i++) {
-            LIB.setLocalAlpha(arrTabs.get(i).get(0), localAlpha);
-            LIB.setLocalAlpha(arrTabs.get(i).get(1), localAlpha);
+            FastDevRKCustomUILib.setLocalAlpha(arrTabs.get(i).get(0), localAlpha);
+            FastDevRKCustomUILib.setLocalAlpha(arrTabs.get(i).get(1), localAlpha);
 
             if (arrTabs.get(i).size() > 5) {
                 for (int j = 5; j < arrTabs.get(i).size(); j++) {
-                    LIB.setLocalAlpha(arrTabs.get(i).get(j), localAlpha);
+                    FastDevRKCustomUILib.setLocalAlpha(arrTabs.get(i).get(j), localAlpha);
                 }
             }
         }

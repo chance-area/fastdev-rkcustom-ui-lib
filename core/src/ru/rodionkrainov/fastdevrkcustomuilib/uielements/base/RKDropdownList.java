@@ -29,8 +29,6 @@ public class RKDropdownList implements IRKUIElement {
     private float borderSize;
     private float roundRadius;
 
-    private final FastDevRKCustomUILib LIB;
-
     private final RKRect titleRect;
     private final RKLabel titleLabel;
 
@@ -41,7 +39,7 @@ public class RKDropdownList implements IRKUIElement {
     private final ArrayList<RKLabel> arrElementsLabels = new ArrayList<>();
     private final ArrayList<RKRect> arrElementsRects   = new ArrayList<>();
 
-    public RKDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
+    public RKDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -53,33 +51,31 @@ public class RKDropdownList implements IRKUIElement {
         roundRadius = _roundRadius;
         fontSize = _fontSize;
 
-        LIB = _lib;
+        titleRect  = FastDevRKCustomUILib.addRect("dropdownList_" + _name + "_titleRect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, roundRadius, zIndex, (localZIndex + 1));;
+        titleLabel = FastDevRKCustomUILib.addLabel("dropdownList_" + _name + "_titleLabel", selectedElementText, fontColor, _fontSize, _posX, _posY, zIndex, localZIndex + 2);
 
-        titleRect  = LIB.addRect("dropdownList_" + _name + "_titleRect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, roundRadius, zIndex, (localZIndex + 1));;
-        titleLabel = LIB.addLabel("dropdownList_" + _name + "_titleLabel", selectedElementText, fontColor, _fontSize, _posX, _posY, zIndex, localZIndex + 2);
-
-        arrowImageUp   = LIB.addImage("dropdownList_" + _name + "_imageArrowUp", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 3);
-        arrowImageDown = LIB.addImage("dropdownList_" + _name + "_imageArrowDown", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 3);
+        arrowImageUp   = FastDevRKCustomUILib.addImage("dropdownList_" + _name + "_imageArrowUp", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 3);
+        arrowImageDown = FastDevRKCustomUILib.addImage("dropdownList_" + _name + "_imageArrowDown", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 3);
 
         setElementsList(new String[0]);
     }
 
     public void setElementsList(String[] _elementsList) {
         for (int i = 0; i < arrElementsRects.size(); i++) {
-            LIB.removeElement(arrElementsLabels.get(i).getName());
-            LIB.removeElement(arrElementsRects.get(i).getName());
+            FastDevRKCustomUILib.removeElement(arrElementsLabels.get(i).getName());
+            FastDevRKCustomUILib.removeElement(arrElementsRects.get(i).getName());
         }
         arrElementsLabels.clear();
         arrElementsRects.clear();
 
         if (_elementsList.length == 0) {
-            arrElementsLabels.add(LIB.addLabel("dropdownList_" + name + "_elementLabel_0", selectedElementText, fontColor, fontSize, getX(), getY(), zIndex + 1, localZIndex + 3));
-            arrElementsRects.add(LIB.addRect("dropdownList_" + name + "_elementRect_0", getX(), getY(), getWidth(), getHeight(), fillColor, borderColor, borderSize, roundRadius, false, false, true, true, zIndex + 1, (localZIndex + 2)));
+            arrElementsLabels.add(FastDevRKCustomUILib.addLabel("dropdownList_" + name + "_elementLabel_0", selectedElementText, fontColor, fontSize, getX(), getY(), zIndex + 1, localZIndex + 3));
+            arrElementsRects.add(FastDevRKCustomUILib.addRect("dropdownList_" + name + "_elementRect_0", getX(), getY(), getWidth(), getHeight(), fillColor, borderColor, borderSize, roundRadius, false, false, true, true, zIndex + 1, (localZIndex + 2)));
             arrElementsRects.get( (arrElementsRects.size() - 1) ).setIsBorderUp(false);
         } else {
             for (int i = 0; i < _elementsList.length; i++) {
-                arrElementsLabels.add(LIB.addLabel("dropdownList_" + name + "_elementLabel_" + i, _elementsList[i], fontColor, fontSize, getX(), getY(), zIndex + 1, localZIndex + 3 + i));
-                arrElementsRects.add(LIB.addRect("dropdownList_" + name + "_elementRect_" + i, getX(), getY(), getWidth(), getHeight(), fillColor, borderColor, borderSize, roundRadius, false, false, (i == (_elementsList.length - 1)), (i == (_elementsList.length - 1)), zIndex + 1, (localZIndex + 2 + i)));
+                arrElementsLabels.add(FastDevRKCustomUILib.addLabel("dropdownList_" + name + "_elementLabel_" + i, _elementsList[i], fontColor, fontSize, getX(), getY(), zIndex + 1, localZIndex + 3 + i));
+                arrElementsRects.add(FastDevRKCustomUILib.addRect("dropdownList_" + name + "_elementRect_" + i, getX(), getY(), getWidth(), getHeight(), fillColor, borderColor, borderSize, roundRadius, false, false, (i == (_elementsList.length - 1)), (i == (_elementsList.length - 1)), zIndex + 1, (localZIndex + 2 + i)));
                 arrElementsRects.get(i).setIsBorderUp(false);
                 if (i != (_elementsList.length - 1)) arrElementsRects.get(i).setIsBorderDown(false);
             }
@@ -101,7 +97,7 @@ public class RKDropdownList implements IRKUIElement {
                     break;
                 }
             }
-            if (titleRect.isPointerHover() || titleLabel.isPointerHover() || isElementHover) LIB.changeCursor(Cursor.HAND_CURSOR);
+            if (titleRect.isPointerHover() || titleLabel.isPointerHover() || isElementHover) FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
             if (titleRect.isInFocus() || titleLabel.isInFocus()) {
                 arrowImageDown.setAlpha(0f);
                 arrowImageUp.setAlpha(1f);
@@ -186,11 +182,6 @@ public class RKDropdownList implements IRKUIElement {
     @Override
     public boolean isPointerHover() {
         return isPointerHover;
-    }
-
-    @Override
-    public void setName(String _name) {
-        name = _name;
     }
 
     @Override

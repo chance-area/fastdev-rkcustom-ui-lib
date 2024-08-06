@@ -27,8 +27,6 @@ public class RKRadioBox implements IRKUIElement {
     private float alpha      = 1f;
     private float localAlpha = 1f;
 
-    private final FastDevRKCustomUILib LIB;
-
     private final float SPACE_RECT_LABEL = 11f;
     private final float SPACE_ELEMENTS   = 115f;
 
@@ -37,18 +35,16 @@ public class RKRadioBox implements IRKUIElement {
 
     private int selectedElementIndex = 0;
 
-    public RKRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
+    public RKRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
 
         fontColor = _fontColor.cpy();
 
-        LIB = _lib;
-
         for (int i = 0; i < _elements.length; i++) {
-            arrRects.add(LIB.addRect("radioBox_" + _name + "_rectButton_" + i, _posX, _posY, _fontSize, _fontSize, GlobalColorsDark.DARK_COLOR_BLUE, _zIndex, localZIndex + 1));
-            arrLabels.add(LIB.addLabel("spinner_" + _name + "_label_" + i, _elements[i], fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 2));
+            arrRects.add(FastDevRKCustomUILib.addRect("radioBox_" + _name + "_rectButton_" + i, _posX, _posY, _fontSize, _fontSize, GlobalColorsDark.DARK_COLOR_BLUE, _zIndex, localZIndex + 1));
+            arrLabels.add(FastDevRKCustomUILib.addLabel("spinner_" + _name + "_label_" + i, _elements[i], fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 2));
 
             arrRects.get(i).setAlpha(0.01f);
         }
@@ -66,7 +62,7 @@ public class RKRadioBox implements IRKUIElement {
                 label.setPosition(getX() + arrRects.get(i).getWidth() + basePosX + SPACE_RECT_LABEL, getY());
 
                 if (rect.isPointerHover() || label.isPointerHover()) {
-                    LIB.changeCursor(Cursor.HAND_CURSOR);
+                    FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
 
                     if (_pointersStates[0][1]) selectedElementIndex = i;
                 }
@@ -133,11 +129,6 @@ public class RKRadioBox implements IRKUIElement {
     @Override
     public boolean isPointerHover() {
         return isPointerHover;
-    }
-
-    @Override
-    public void setName(String _name) {
-        name = _name;
     }
 
     @Override
