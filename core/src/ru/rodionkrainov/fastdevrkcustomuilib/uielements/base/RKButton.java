@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
+package ru.rodionkrainov.fastdevrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -8,9 +8,9 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.awt.Cursor;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
-import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
+import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
 
 public class RKButton implements IRKUIElement {
     private String name;
@@ -27,13 +27,13 @@ public class RKButton implements IRKUIElement {
     private float localAlpha = 1f;
     private float borderSize;
 
-    private final LibGdxRKCustomUILib LIB;
+    private final FastDevRKCustomUILib LIB;
     private final IButtonClickEvent onButtonClickEvent;
 
     private final RKRect buttonRect;
     private final RKLabel buttonLabel;
 
-    public RKButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onButtonClickEvent, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
+    public RKButton(String _name, String _text, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, IButtonClickEvent _onButtonClickEvent, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;

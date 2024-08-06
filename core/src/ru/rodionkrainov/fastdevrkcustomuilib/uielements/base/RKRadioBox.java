@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
+package ru.rodionkrainov.fastdevrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -9,10 +9,10 @@ import com.badlogic.gdx.math.Vector2;
 import java.awt.Cursor;
 import java.util.ArrayList;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
-import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
-import ru.rodionkrainov.libgdxrkcustomuilib.utils.DrawingTools;
+import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
+import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
 
 public class RKRadioBox implements IRKUIElement {
     private String name;
@@ -27,7 +27,7 @@ public class RKRadioBox implements IRKUIElement {
     private float alpha      = 1f;
     private float localAlpha = 1f;
 
-    private final LibGdxRKCustomUILib LIB;
+    private final FastDevRKCustomUILib LIB;
 
     private final float SPACE_RECT_LABEL = 11f;
     private final float SPACE_ELEMENTS   = 115f;
@@ -37,7 +37,7 @@ public class RKRadioBox implements IRKUIElement {
 
     private int selectedElementIndex = 0;
 
-    public RKRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
+    public RKRadioBox(String _name, String[] _elements, Color _fontColor, int _fontSize, float _posX, float _posY, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -47,10 +47,8 @@ public class RKRadioBox implements IRKUIElement {
         LIB = _lib;
 
         for (int i = 0; i < _elements.length; i++) {
-            float basePoxX = i * (i > 0 ? (arrRects.get( (i - 1) ).getWidth() + arrLabels.get( (i - 1) ).getWidth() + SPACE_RECT_LABEL) + SPACE_ELEMENTS : 0);
-
-            arrRects.add(LIB.addRect("radioBox_" + _name + "_rectButton_" + i, _posX + basePoxX, _posY, _fontSize, _fontSize, GlobalColorsDark.DARK_COLOR_BLUE, _zIndex, localZIndex + 1));
-            arrLabels.add(LIB.addLabel("spinner_" + _name + "_label_" + i, _elements[i], fontColor, _fontSize, _posX + arrRects.get(i).getWidth() + basePoxX + SPACE_RECT_LABEL, _posY, _zIndex, localZIndex + 2));
+            arrRects.add(LIB.addRect("radioBox_" + _name + "_rectButton_" + i, _posX, _posY, _fontSize, _fontSize, GlobalColorsDark.DARK_COLOR_BLUE, _zIndex, localZIndex + 1));
+            arrLabels.add(LIB.addLabel("spinner_" + _name + "_label_" + i, _elements[i], fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 2));
 
             arrRects.get(i).setAlpha(0.01f);
         }
@@ -62,6 +60,10 @@ public class RKRadioBox implements IRKUIElement {
             for (int i = 0; i < arrRects.size(); i++) {
                 RKRect rect = arrRects.get(i);
                 RKLabel label = arrLabels.get(i);
+
+                float basePosX = i * (i > 0 ? (arrRects.get( (i - 1) ).getWidth() + arrLabels.get( (i - 1) ).getWidth() + SPACE_RECT_LABEL) + SPACE_ELEMENTS : 0);
+                rect.setPosition(getX() + basePosX, getY());
+                label.setPosition(getX() + arrRects.get(i).getWidth() + basePosX + SPACE_RECT_LABEL, getY());
 
                 if (rect.isPointerHover() || label.isPointerHover()) {
                     LIB.changeCursor(Cursor.HAND_CURSOR);
@@ -229,12 +231,15 @@ public class RKRadioBox implements IRKUIElement {
 
     @Override
     public Vector2 getSize() {
-        return (!arrRects.isEmpty() ? arrRects.get(0).getSize() : null);
+        return (new Vector2(getWidth(), getHeight()));
     }
 
     @Override
     public float getWidth() {
-        return (!arrRects.isEmpty() ? arrRects.get(0).getWidth() : -1);
+        float sumWidth = 0;
+        for (int i = 0; i < arrRects.size(); i++) sumWidth += arrRects.get(i).getWidth() + SPACE_RECT_LABEL + arrLabels.get(i).getWidth() + (i != (arrRects.size() - 1) ? SPACE_ELEMENTS : 0);
+
+        return sumWidth;
     }
 
     @Override

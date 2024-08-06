@@ -1,6 +1,5 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
+package ru.rodionkrainov.fastdevrkcustomuilib.uielements.base;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -8,11 +7,10 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.awt.Cursor;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
-import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
+import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
 
 public class RKDropdownList implements IRKUIElement {
     private String name;
@@ -31,7 +29,7 @@ public class RKDropdownList implements IRKUIElement {
     private float borderSize;
     private float roundRadius;
 
-    private final LibGdxRKCustomUILib LIB;
+    private final FastDevRKCustomUILib LIB;
 
     private final RKRect titleRect;
     private final RKLabel titleLabel;
@@ -43,7 +41,7 @@ public class RKDropdownList implements IRKUIElement {
     private final ArrayList<RKLabel> arrElementsLabels = new ArrayList<>();
     private final ArrayList<RKRect> arrElementsRects   = new ArrayList<>();
 
-    public RKDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
+    public RKDropdownList(String _name, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -60,8 +58,8 @@ public class RKDropdownList implements IRKUIElement {
         titleRect  = LIB.addRect("dropdownList_" + _name + "_titleRect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, roundRadius, zIndex, (localZIndex + 1));;
         titleLabel = LIB.addLabel("dropdownList_" + _name + "_titleLabel", selectedElementText, fontColor, _fontSize, _posX, _posY, zIndex, localZIndex + 2);
 
-        arrowImageUp   = LIB.addImage("dropdownList_" + _name + "_imageArrowUp", LIB.getDefaultImageName(LibGdxRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 3);
-        arrowImageDown = LIB.addImage("dropdownList_" + _name + "_imageArrowDown", LIB.getDefaultImageName(LibGdxRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 3);
+        arrowImageUp   = LIB.addImage("dropdownList_" + _name + "_imageArrowUp", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 3);
+        arrowImageDown = LIB.addImage("dropdownList_" + _name + "_imageArrowDown", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 3);
 
         setElementsList(new String[0]);
     }

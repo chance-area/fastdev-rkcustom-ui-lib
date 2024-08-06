@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
+package ru.rodionkrainov.fastdevrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -9,10 +9,10 @@ import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
-import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
-import ru.rodionkrainov.libgdxrkcustomuilib.utils.DrawingTools;
+import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
+import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
 
 public class RKTabPanelsManager implements IRKUIElement {
     private String name;
@@ -29,12 +29,13 @@ public class RKTabPanelsManager implements IRKUIElement {
     private float alpha      = 1f;
     private float localAlpha = 1f;
 
-    private final LibGdxRKCustomUILib LIB;
+    private final FastDevRKCustomUILib LIB;
     private final ShapeRenderer shapeRenderer;
 
     private final Vector2 position;
     private final Vector2 size;
     private float tabHeight;
+    private float tabsWidthSum;
 
     private final int LABEL_FONT_SIZE;
     private final float SPACE_BETWEEN_TABS     = 0.75f;
@@ -52,7 +53,7 @@ public class RKTabPanelsManager implements IRKUIElement {
     private boolean isSelectedTabChanged = false;
     private final ArrayList<ArrayList<String>> arrTabs = new ArrayList<>();
 
-    public RKTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
+    public RKTabPanelsManager(String _name, float _posX, float _posY, int _labelFontSize, Color _panelsBgColor, Color _panelsBorderColor, float _borderSize, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -168,6 +169,7 @@ public class RKTabPanelsManager implements IRKUIElement {
                     LIB.setFillColor(rectName, GlobalColorsDark.DARK_COLOR_TABS);
                 }
             }
+            tabsWidthSum = sumWidthLeft;
 
             // tabs content (attached elements) - change visible on select tab
             if (isSelectedTabChanged) {
@@ -252,6 +254,10 @@ public class RKTabPanelsManager implements IRKUIElement {
                 }
             }
         }
+    }
+
+    public float getTabsWidthSum() {
+        return tabsWidthSum;
     }
 
     @Override

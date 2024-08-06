@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib;
+package ru.rodionkrainov.fastdevrkcustomuilib;
 
 import com.badlogic.gdx.graphics.Color;
 

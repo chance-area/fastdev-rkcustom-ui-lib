@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.utils;
+package ru.rodionkrainov.fastdevrkcustomuilib.utils;
 
 public abstract class MathPlus {
 

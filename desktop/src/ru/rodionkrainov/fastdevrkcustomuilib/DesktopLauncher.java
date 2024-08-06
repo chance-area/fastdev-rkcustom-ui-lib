@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib;
+package ru.rodionkrainov.fastdevrkcustomuilib;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl.LwjglCanvas;
@@ -18,7 +18,7 @@ public class DesktopLauncher extends JFrame {
 		double screenScaleFactor = Toolkit.getDefaultToolkit().getScreenResolution() / 96.0f;
 
 		SwingUtilities.invokeLater(() -> {
-			setTitle(LibGdxRKCustomUILib.LIB_NAME + " (v. " + LibGdxRKCustomUILib.LIB_VERSION + ") " + " - Tests UI elements");
+			setTitle(FastDevRKCustomUILib.LIB_NAME + " (v. " + FastDevRKCustomUILib.LIB_VERSION + ") " + " - Tests UI elements");
 			setSize(new Dimension((int) (TestsUIElements.windowWidth / screenScaleFactor + 14), (int) (TestsUIElements.windowHeight / screenScaleFactor + 37)));
 			setPreferredSize(new Dimension(getWidth(), getHeight()));
 			setLocationRelativeTo(null);

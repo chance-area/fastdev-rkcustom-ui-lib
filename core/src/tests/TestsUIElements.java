@@ -21,14 +21,14 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import javax.swing.JFrame;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
-import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKButton;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKDropdownList;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKRadioBox;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKSpinner;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKTabPanelsManager;
+import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
+import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKButton;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKDropdownList;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKRadioBox;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKSpinner;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKTabPanelsManager;
 
 public class TestsUIElements extends ApplicationAdapter {
     public static boolean isDesktop       = false;
@@ -46,7 +46,7 @@ public class TestsUIElements extends ApplicationAdapter {
     public static InputMultiplexer inputMultiplexer;
 
     private boolean isUIElementsInit = false;
-    private LibGdxRKCustomUILib rkCustomUILib = null;
+    private FastDevRKCustomUILib rkCustomUILib = null;
 
     /* ------------------- Elements names (constants) ------------------- */
     private final String nameLabelFPS = "label_fps";
@@ -108,7 +108,7 @@ public class TestsUIElements extends ApplicationAdapter {
         String[][] imagesNamesPath = new String[][] {
                 //
         };
-        rkCustomUILib = new LibGdxRKCustomUILib("fonts/ubuntu/ubuntu-regular.ttf", 0f, 2, "png", imagesNamesPath, false, windowWidth, windowHeight, isDesktop, superDuperJFrame);
+        rkCustomUILib = new FastDevRKCustomUILib("fonts/ubuntu/ubuntu-regular.ttf", 0f, 2, "png", imagesNamesPath, false, windowWidth, windowHeight, isDesktop, superDuperJFrame);
 
         // ---------------- ### Add to stage ### ------------------
         stage.addActor(rkCustomUILib);
@@ -151,7 +151,7 @@ public class TestsUIElements extends ApplicationAdapter {
         tabPanelsManagerOne.addTab("base_elements", "Базовые элементы");
         tabPanelsManagerOne.addTab("3d_elements", "3D среда");
         tabPanelsManagerOne.addTab("graphs_elements", "Графики");
-        tabPanelsManagerOne.addTab("settings_elements", "%#img_" + rkCustomUILib.getDefaultImageName(LibGdxRKCustomUILib.DefaultImages.SETTINGS_ICON) + "#%", 1);
+        tabPanelsManagerOne.addTab("settings_elements", "%#img_" + rkCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.SETTINGS_ICON) + "#%", 1);
 
         // tab panel 2 (mini, attach to main)
         tabPanelsManagerTwo.addTab("example_one", "Пример 1");
@@ -199,8 +199,8 @@ public class TestsUIElements extends ApplicationAdapter {
                 tabPanelsManagerOne.setSize(windowWidth, windowHeight - tabPanelsManagerOne.getTabHeight());
                 tabPanelsManagerOne.setPosition(0, 0);
 
-                tabPanelsManagerTwo.setSize((isDesktop ? 500 : 600), 420);
-                tabPanelsManagerTwo.setPosition(windowWidth * 0.45f, windowHeight * 0.13f);
+                tabPanelsManagerTwo.setSize((isDesktop ? 520 : 600), 530);
+                tabPanelsManagerTwo.setPosition(windowWidth * 0.45f, ((tabPanelsManagerOne.getHeight() - tabPanelsManagerOne.getTabHeight()) - tabPanelsManagerTwo.getHeight()) / 2f);
 
                 if (!buttonOne.isInFocus()) {
                     buttonOne.setFontColor(GlobalColorsDark.DARK_COLOR_WHITE);

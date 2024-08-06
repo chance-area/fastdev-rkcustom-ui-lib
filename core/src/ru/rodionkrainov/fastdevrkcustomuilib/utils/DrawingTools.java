@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.utils;
+package ru.rodionkrainov.fastdevrkcustomuilib.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;

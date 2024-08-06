@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements;
+package ru.rodionkrainov.fastdevrkcustomuilib.uielements;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,7 +14,6 @@ public interface IRKUIElement {
     boolean isVisible();
     boolean isPointerHover();
 
-    void setName(String _name);
     void setPosition(float _x, float _y);
     void setX(float _x);
     void setY(float _y);

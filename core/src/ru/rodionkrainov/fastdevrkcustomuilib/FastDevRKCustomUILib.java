@@ -9,7 +9,7 @@
 *
  **/
 
-package ru.rodionkrainov.libgdxrkcustomuilib;
+package ru.rodionkrainov.fastdevrkcustomuilib;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -27,20 +27,20 @@ import java.util.Objects;
 
 import javax.swing.JFrame;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.IButtonClickEvent;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKButton;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKDropdownList;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKImage;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKLabel;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKRadioBox;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKRect;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKSpinner;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.base.RKTabPanelsManager;
-import ru.rodionkrainov.libgdxrkcustomuilib.utils.CustomClickListener;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.IButtonClickEvent;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKButton;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKDropdownList;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKImage;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKLabel;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKRadioBox;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKRect;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKSpinner;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKTabPanelsManager;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.CustomClickListener;
 
-public class LibGdxRKCustomUILib extends Actor {
-    public static final String LIB_NAME    = "LibGdxRKCustomUILib";
+public class FastDevRKCustomUILib extends Actor {
+    public static final String LIB_NAME    = "FastDevRKCustomUILib";
     public static final String LIB_VERSION = "0.4";
 
     private boolean isAllResLoaded;
@@ -88,7 +88,7 @@ public class LibGdxRKCustomUILib extends Actor {
     private final ArrayList<RKDropdownList>     arrRKDropdownLists     = new ArrayList<>();
     private final ArrayList<RKRadioBox>         arrRKRadioBoxes        = new ArrayList<>();
 
-    public LibGdxRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
+    public FastDevRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
         super();
 
         windowWidth  = _windowWidth;
@@ -122,7 +122,7 @@ public class LibGdxRKCustomUILib extends Actor {
         this.setTouchable(Touchable.enabled);
         this.addListener(customClickListener);
     }
-    public LibGdxRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
+    public FastDevRKCustomUILib(String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, float _windowWidth, float _windowHeight, boolean _isDesktop, JFrame _jframe) {
         this(_fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, true, _windowWidth, _windowHeight, _isDesktop, _jframe);
     }
 
@@ -465,9 +465,6 @@ public class LibGdxRKCustomUILib extends Actor {
     }
 
     // ### For All (setters) ###
-    public void setName(String _nameElement, String _newName) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setName(_newName);
-    }
     public void setPosition(String _nameElement, float _x, float _y) {
         Objects.requireNonNull(foundAndGetElement(_nameElement)).setPosition(_x, _y);
     }

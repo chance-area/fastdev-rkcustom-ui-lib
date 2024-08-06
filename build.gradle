@@ -20,7 +20,7 @@ allprojects {
 
     version = '0.4'
     ext {
-        appName = "LibGdxRKCustomUILib"
+        appName = 'FastDevRKCustomUILib'
         gdxVersion = '1.12.1'
         roboVMVersion = '2.3.20'
         ashleyVersion = '1.7.4'

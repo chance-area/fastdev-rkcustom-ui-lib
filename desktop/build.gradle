@@ -1,7 +1,7 @@
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["../assets"]
 
-project.ext.mainClassName = "ru.rodionkrainov.libgdxrkcustomuilib.DesktopLauncher"
+project.ext.mainClassName = "ru.rodionkrainov.fastdevrkcustomuilib.DesktopLauncher"
 project.ext.assetsDir = new File("../assets")
 
 import org.gradle.internal.os.OperatingSystem

@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib.uielements.base;
+package ru.rodionkrainov.fastdevrkcustomuilib.uielements.base;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -7,11 +7,11 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.awt.Cursor;
 
-import ru.rodionkrainov.libgdxrkcustomuilib.GlobalColorsDark;
-import ru.rodionkrainov.libgdxrkcustomuilib.LibGdxRKCustomUILib;
-import ru.rodionkrainov.libgdxrkcustomuilib.uielements.IRKUIElement;
-import ru.rodionkrainov.libgdxrkcustomuilib.utils.DrawingTools;
-import ru.rodionkrainov.libgdxrkcustomuilib.utils.MathPlus;
+import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
+import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.MathPlus;
 
 public class RKSpinner implements IRKUIElement {
     private String name;
@@ -28,7 +28,7 @@ public class RKSpinner implements IRKUIElement {
     private float localAlpha = 1f;
     private float borderSize;
 
-    private final LibGdxRKCustomUILib LIB;
+    private final FastDevRKCustomUILib LIB;
 
     private final RKRect spinnerRect;
     private final RKLabel spinnerLabel;
@@ -44,7 +44,7 @@ public class RKSpinner implements IRKUIElement {
     private float maxValue;
     private float step;
 
-    public RKSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex, LibGdxRKCustomUILib _lib) {
+    public RKSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex, FastDevRKCustomUILib _lib) {
         name   = _name;
         zIndex = _zIndex;
         localZIndex = _localZIndex;
@@ -68,8 +68,8 @@ public class RKSpinner implements IRKUIElement {
         arrowRectUp   = LIB.addRect("spinner_" + _name + "_rectArrowUp", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, true, false, false, _zIndex, localZIndex + 1);
         arrowRectDown = LIB.addRect("spinner_" + _name + "_rectArrowDown", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, false, false, true, _zIndex,  + 1);
 
-        arrowImageUp   = LIB.addImage("spinner_" + _name + "_imageArrowUp", LIB.getDefaultImageName(LibGdxRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 2);
-        arrowImageDown = LIB.addImage("spinner_" + _name + "_imageArrowDown", LIB.getDefaultImageName(LibGdxRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 2);
+        arrowImageUp   = LIB.addImage("spinner_" + _name + "_imageArrowUp", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 2);
+        arrowImageDown = LIB.addImage("spinner_" + _name + "_imageArrowDown", LIB.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 2);
     }
 
     @Override

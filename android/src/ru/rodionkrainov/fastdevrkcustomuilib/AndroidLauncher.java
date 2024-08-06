@@ -1,4 +1,4 @@
-package ru.rodionkrainov.libgdxrkcustomuilib;
+package ru.rodionkrainov.fastdevrkcustomuilib;
 
 import android.os.Bundle;
 
