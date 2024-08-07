@@ -1,42 +1,53 @@
 package ru.rodionkrainov.fastdevrkcustomuilib.uielements;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
-public class RKCustomElement implements IRKUIElement {
-    private final String NAME;                 // name current element
+public abstract class RKCustomElement implements IRKUIElement {
+    private final String NAME;
+    private final String ELEMENT_TYPE;
 
     private int zIndex;
     private final int localZIndex;
     private boolean isPointerHover = false;
-    private boolean isInFocus = false;
-    private boolean isVisible = true;
+    private boolean isInFocus      = false;
+    private boolean isVisible      = true;
 
-    private final Vector2 vPosition = new Vector2(-1, -1);
-    private final Vector2 vSize     = new Vector2(-1, -1);
+    private final Vector2 vPosition;
+    private float width;
+    private float height;
 
     private Color fillColor;
     private Color borderColor;
-    private float alpha      = 1f;
-    private float localAlpha = 1f;
+    private float borderSize;
+    private float alpha;
+    private float localAlpha;
 
-    public RKCustomElement(String _name, int _zIndex, int _localZIndex) {
-        NAME = _name;
+    public RKCustomElement(String _name, String _elementType, float _width, float _height, float _x, float _y, float _alpha, float _localAlpha, int _zIndex, int _localZIndex) {
+        NAME         = _name;
+        ELEMENT_TYPE = _elementType;
+
+        vPosition = new Vector2(_x, _y);
+        width     = _width;
+        height    = _height;
 
         zIndex      = _zIndex;
         localZIndex = _localZIndex;
+        alpha       = _alpha;
+        localAlpha  = _localAlpha;
     }
 
     @Override
     public void update(float _delta, boolean[][] _pointersStates) {
-
+        // TODO
     }
 
     @Override
-    public void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha) {
-
+    public void draw(Batch _batch, ShapeRenderer _shapeRenderer) {
+        // TODO
     }
 
     @Override
@@ -61,141 +72,159 @@ public class RKCustomElement implements IRKUIElement {
 
     @Override
     public void setPosition(float _x, float _y) {
-        //
+        vPosition.set(_x, _y);
     }
 
     @Override
     public void setX(float _x) {
-
+        vPosition.x = _x;
     }
 
     @Override
     public void setY(float _y) {
-
+        vPosition.y = _y;
     }
 
     @Override
-    public void setSize(float _w, float _h) {
-
+    public void setSize(float _width, float _height) {
+        width  = _width;
+        height = _height;
     }
 
     @Override
-    public void setWidth(float _w) {
-
+    public void setWidth(float _width) {
+        width = _width;
     }
 
     @Override
-    public void setHeight(float _h) {
-
+    public void setHeight(float _height) {
+        height = _height;
     }
 
     @Override
     public void setFillColor(Color _color) {
-
+        if (_color != null) {
+            fillColor = _color.cpy();
+            fillColor.a = Math.min(alpha, localAlpha);
+        }
     }
 
     @Override
     public void setBorderColor(Color _color) {
+        if (_color != null) {
+            borderColor = _color.cpy();
+            borderColor.a = Math.min(alpha, localAlpha);
+        }
+    }
 
+    @Override
+    public void setBorderSize(float _borderSize) {
+        borderSize = _borderSize;
     }
 
     @Override
     public void setAlpha(float _alpha) {
+        alpha = _alpha;
 
+        if (fillColor != null) fillColor.a   = Math.min(getAlpha(), getLocalAlpha());
+        if (borderColor != null) borderColor.a = Math.min(getAlpha(), getLocalAlpha());
     }
 
     @Override
     public void setLocalAlpha(float _localAlpha) {
+        localAlpha = _localAlpha;
 
+        if (fillColor != null) fillColor.a   = Math.min(getAlpha(), getLocalAlpha());
+        if (borderColor != null) borderColor.a = Math.min(getAlpha(), getLocalAlpha());
     }
 
     @Override
     public void setZIndex(int _zIndex) {
-
+        zIndex = _zIndex;
     }
 
     @Override
     public void setIsInFocus(boolean _isInFocus) {
-
+        isInFocus = _isInFocus;
     }
 
     @Override
     public String getName() {
-        return null;
+        return NAME;
     }
 
     @Override
     public Vector2 getPosition() {
-        return null;
+        return vPosition;
     }
 
     @Override
     public float getX() {
-        return 0;
+        return vPosition.x;
     }
 
     @Override
     public float getY() {
-        return 0;
-    }
-
-    @Override
-    public Vector2 getSize() {
-        return null;
+        return vPosition.y;
     }
 
     @Override
     public float getWidth() {
-        return 0;
+        return width;
     }
 
     @Override
     public float getHeight() {
-        return 0;
+        return height;
     }
 
     @Override
     public Color getFillColor() {
-        return null;
+        return fillColor;
     }
 
     @Override
     public Color getBorderColor() {
-        return null;
+        return borderColor;
+    }
+
+    @Override
+    public float getBorderSize() {
+        return borderSize;
     }
 
     @Override
     public float getAlpha() {
-        return 0;
+        return alpha;
     }
 
     @Override
     public float getLocalAlpha() {
-        return 0;
+        return localAlpha;
     }
 
     @Override
     public String getType() {
-        return null;
+        return ELEMENT_TYPE;
     }
 
     @Override
     public int getZIndex() {
-        return 0;
+        return zIndex;
     }
 
     @Override
     public int getLocalZIndex() {
-        return 0;
+        return localZIndex;
     }
 
     @Override
     public boolean isInFocus() {
-        return false;
+        return isInFocus;
     }
 
     @Override
     public void dispose() {
-
+        // TODO
     }
 }

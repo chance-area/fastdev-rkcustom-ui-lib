@@ -1,6 +1,6 @@
 package ru.rodionkrainov.fastdevrkcustomuilib.utils;
 
-public abstract class MathPlus {
+public final class MathPlus {
 
     // ------------- Numbers ------------
     public static float roundTo(float _number, int _count) {

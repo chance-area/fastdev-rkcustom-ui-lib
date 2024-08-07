@@ -89,9 +89,7 @@ public final class FastDevRKCustomUILib {
     // all UI elements (objects)
     private static final ArrayList<IRKUIElement> arrRKUIElements = new ArrayList<>();
 
-    private FastDevRKCustomUILib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine) {
-        /* ...ignore... */
-    }
+    private FastDevRKCustomUILib() { /* ...ignore... */ }
 
     public static void initLib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine) {
         if (!isLibInit) {
@@ -169,7 +167,6 @@ public final class FastDevRKCustomUILib {
 
                 isAllResLoaded = (getLoadingPercent() == 100f);
             } else if (isCanShowUIElements) {
-                //this.setBounds(0, 0, windowWidth, windowHeight);
                 customInputProcessorUI.update();
 
                 // sorting elements by zIndex (from least to most)
@@ -238,7 +235,7 @@ public final class FastDevRKCustomUILib {
                 for (IRKUIElement uiElement : arrRKUIElements) {
                     if (uiElement.isVisible() && uiElement.getX() < windowWidth && uiElement.getY() > -uiElement.getHeight()) {
                         batch.begin();
-                        uiElement.draw(batch, shapeRenderer, 1f);
+                        uiElement.draw(batch, shapeRenderer);
                         batch.end();
                     }
                 }
@@ -344,7 +341,7 @@ public final class FastDevRKCustomUILib {
     ---------------------------------------------------------------------------------------- */
 
     public static Texture getImageTexture(String _imageName) {
-        return (isAllResLoaded ? GlobalImagesManager.getImageTexture(_imageName, assetManager) : null);
+        return (isLibInit() && isAllResLoaded ? GlobalImagesManager.getImageTexture(_imageName, assetManager) : null);
     }
 
 
@@ -353,7 +350,7 @@ public final class FastDevRKCustomUILib {
     ---------------------------------------------------------------------------------------- */
 
     public static void addElement(IRKUIElement _element) {
-        if (isAllResLoaded) {
+        if (isLibInit() && isAllResLoaded) {
             arrRKUIElements.add(_element);
             arrRKUIElements.sort(Comparator.comparingInt(IRKUIElement::getZIndex));
 
@@ -377,7 +374,7 @@ public final class FastDevRKCustomUILib {
     }
 
     public static void removeElement(String _name) {
-        if (isAllResLoaded) {
+        if (isLibInit() && isAllResLoaded) {
             for (int i = 0; i < arrRKUIElements.size(); i++) {
                 if (arrRKUIElements.get(i).getName().equals(_name)) {
                     arrRKUIElements.remove(i);
@@ -546,147 +543,29 @@ public final class FastDevRKCustomUILib {
     --------------------------------- 'ELEMENTS' METHODS -----------------------------------
     ---------------------------------------------------------------------------------------- */
 
-    private static IRKUIElement foundAndGetElement(String _name) {
-        if (isAllResLoaded) {
+    public static IRKUIElement foundAndGetElement(String _elementName) {
+        if (isLibInit() && isAllResLoaded) {
             for (int i = 0; i < arrRKUIElements.size(); i++) {
-                if (arrRKUIElements.get(i).getName().equals(_name)) return arrRKUIElements.get(i);
+                if (arrRKUIElements.get(i).getName().equals(_elementName)) return arrRKUIElements.get(i);
             }
         }
         return null;
     }
-    private static RKLabel foundAndGetLabel(String _name) {
-        if (isAllResLoaded) return (RKLabel) foundAndGetElement(_name);
+    public static RKLabel foundAndGetLabel(String _labelName) {
+        if (isLibInit() && isAllResLoaded) return (RKLabel) foundAndGetElement(_labelName);
         return null;
     }
-    private static RKRect foundAndGetRect(String _name) {
-        if (isAllResLoaded) return (RKRect) foundAndGetElement(_name);
+    public static RKRect foundAndGetRect(String _rectName) {
+        if (isLibInit() && isAllResLoaded) return (RKRect) foundAndGetElement(_rectName);
         return null;
     }
-    private static RKTabPanelsManager foundAndGetTabPanelsManager(String _name) {
-        if (isAllResLoaded) return (RKTabPanelsManager) foundAndGetElement(_name);
+    public static RKTabPanelsManager foundAndGetTabPanelsManager(String _tabPanelsManagerName) {
+        if (isLibInit() && isAllResLoaded) return (RKTabPanelsManager) foundAndGetElement(_tabPanelsManagerName);
         return null;
     }
-    private static RKButton foundAndGetButton(String _name) {
-        if (isAllResLoaded) return (RKButton) foundAndGetElement(_name);
+    public static RKButton foundAndGetButton(String _buttonName) {
+        if (isLibInit() && isAllResLoaded) return (RKButton) foundAndGetElement(_buttonName);
         return null;
-    }
-
-    // ### For All (setters) ###
-    public static void setPosition(String _nameElement, float _x, float _y) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setPosition(_x, _y);
-    }
-    public static void setX(String _nameElement, float _x) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setX(_x);
-    }
-    public static void setY(String _nameElement, float _y) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setY(_y);
-    }
-    public static void setSize(String _nameElement, float _w, float _h) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setSize(_w, _h);
-    }
-    public static void setWidth(String _nameElement, float _w) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setWidth(_w);
-    }
-    public static void setHeight(String _nameElement, float _h) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setHeight(_h);
-    }
-    public static void setFillColor(String _nameElement, Color _color) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setFillColor(_color);
-    }
-    public static void setBorderColor(String _nameElement, Color _color) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setBorderColor(_color);
-    }
-    public static void setAlpha(String _nameElement, float _alpha) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setAlpha(_alpha);
-    }
-    public static void setLocalAlpha(String _nameElement, float _localAlpha) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setLocalAlpha(_localAlpha);
-    }
-    public static void setVisible(String _nameElement, boolean _isVisible) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setVisible(_isVisible);
-    }
-    public static void setZIndex(String _nameElement, int _zIndex) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setZIndex(_zIndex);
-        isZIndexChanged = true;
-    }
-    public static void setIsInFocus(String _nameElement, boolean _isInFocus) {
-        Objects.requireNonNull(foundAndGetElement(_nameElement)).setIsInFocus(_isInFocus);
-    }
-
-    // ### For All (getters) ###
-    public static String getType(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getType();
-    }
-    public static Vector2 getPosition(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getPosition();
-    }
-    public static float getX(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getX();
-    }
-    public static float getY(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getY();
-    }
-    public static Vector2 getSize(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getSize();
-    }
-    public static float getWidth(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getWidth();
-    }
-    public static float getHeight(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getHeight();
-    }
-    public static Color getFillColor(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getFillColor();
-    }
-    public static Color getBorderColor(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getBorderColor();
-    }
-    public static float getAlpha(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getAlpha();
-    }
-    public static float getLocalAlpha(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getLocalAlpha();
-    }
-    public static boolean isVisible(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).isVisible();
-    }
-    public static boolean isPointerHover(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).isPointerHover();
-    }
-    public static int getZIndex(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).getZIndex();
-    }
-    public static boolean isInFocus(String _nameElement) {
-        return Objects.requireNonNull(foundAndGetElement(_nameElement)).isInFocus();
-    }
-
-    // ### Label (setters) ###
-    public static void setLabelText(String _nameLabel, String _text) {
-        Objects.requireNonNull(foundAndGetLabel(_nameLabel)).setText(_text);
-    }
-
-    // ### Label (getters) ###
-    public static String getLabelText(String _nameLabel) {
-        return Objects.requireNonNull(foundAndGetLabel(_nameLabel)).getText();
-    }
-
-    public static RKLabel getRKLabel(String _nameLabel) {
-        return Objects.requireNonNull(foundAndGetLabel(_nameLabel));
-    }
-
-    // ### Rects (getters) ###
-    public static RKRect getRKRect(String _nameRect) {
-        return Objects.requireNonNull(foundAndGetRect(_nameRect));
-    }
-
-    // ### Tabs (getters) ###
-    public static RKTabPanelsManager getRKTabPanelsManager(String _nameTabPanelsManager) {
-        return foundAndGetTabPanelsManager(_nameTabPanelsManager);
-    }
-
-    // ### Buttons ###
-    public static RKButton getRKButton(String _nameButton) {
-        return foundAndGetButton(_nameButton);
     }
 
 

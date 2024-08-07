@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 
-public abstract class DrawingTools {
+public final class DrawingTools {
     public static void enableGLBlend() {
         if (Gdx.app.getGraphics().isGL30Available()) {
             Gdx.gl30.glEnable(GL30.GL_BLEND);

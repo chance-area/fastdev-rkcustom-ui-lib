@@ -3,30 +3,17 @@ package ru.rodionkrainov.fastdevrkcustomuilib.uielements.base;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 
 import java.awt.Cursor;
 
 import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
-import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.MathPlus;
 
-public class RKSpinner implements IRKUIElement {
-    private String name;
-    private int zIndex;
-    private final int localZIndex;
-    private boolean isVisible = true;
-    private boolean isPointerHover = false;
-    private boolean isInFocus = false;
-
+public class RKSpinner extends RKCustomElement {
     private Color fontColor;
-    private Color fillColor;
-    private Color borderColor;
-    private float alpha      = 1f;
-    private float localAlpha = 1f;
-    private float borderSize;
 
     private final RKRect spinnerRect;
     private final RKLabel spinnerLabel;
@@ -43,14 +30,14 @@ public class RKSpinner implements IRKUIElement {
     private float step;
 
     public RKSpinner(String _name, float _defNum, float _min, float _max, float _step, Color _fontColor, int _fontSize, float _posX, float _posY, float _w, float _h, float _borderSize, float _roundRadius, int _zIndex, int _localZIndex) {
-        name   = _name;
-        zIndex = _zIndex;
-        localZIndex = _localZIndex;
+        super(_name, "spinner", _w, _h, _posX, _posY, 1f, 1f, _zIndex, _localZIndex);
 
-        fontColor   = _fontColor.cpy();
-        fillColor   = GlobalColorsDark.DARK_COLOR_BUTTON.cpy();
-        borderColor = GlobalColorsDark.DARK_COLOR_BUTTON_BORDER.cpy();
-        borderSize  = _borderSize;
+        setFillColor(GlobalColorsDark.DARK_COLOR_BUTTON);
+        setBorderColor(GlobalColorsDark.DARK_COLOR_BUTTON_BORDER);
+        setBorderSize(_borderSize);
+
+        fontColor = _fontColor.cpy();
+
         arrowsButtonsWidth = _h / 1.9f;
 
         value    = _defNum;
@@ -58,29 +45,33 @@ public class RKSpinner implements IRKUIElement {
         maxValue = _max;
         step     = _step;
 
-        spinnerRect  = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rect", _posX, _posY, _w, _h, fillColor, borderColor, borderSize, _roundRadius, _zIndex, localZIndex);
-        spinnerLabel = FastDevRKCustomUILib.addLabel("spinner_" + _name + "_label", String.valueOf(value), fontColor, _fontSize, _posX, _posY, _zIndex, localZIndex + 1);
+        spinnerRect  = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rect", _posX, _posY, _w, _h, getFillColor(), getBorderColor(), getBorderSize(), _roundRadius, _zIndex, getLocalZIndex());
+        spinnerLabel = FastDevRKCustomUILib.addLabel("spinner_" + _name + "_label", String.valueOf(value), fontColor, _fontSize, _posX, _posY, _zIndex, getLocalZIndex() + 1);
 
-        arrowRectUp   = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rectArrowUp", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, true, false, false, _zIndex, localZIndex + 1);
-        arrowRectDown = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rectArrowDown", _posX, _posY, arrowsButtonsWidth, _h / 2f - borderSize, GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, borderColor, 0, _roundRadius, false, false, false, true, _zIndex,  + 1);
+        arrowRectUp   = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rectArrowUp", _posX, _posY, arrowsButtonsWidth, _h / 2f - getBorderSize(), GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, getBorderColor(), 0, _roundRadius, false, true, false, false, _zIndex, getLocalZIndex() + 1);
+        arrowRectDown = FastDevRKCustomUILib.addRect("spinner_" + _name + "_rectArrowDown", _posX, _posY, arrowsButtonsWidth, _h / 2f - getBorderSize(), GlobalColorsDark.DARK_COLOR_SPINNER_BUTTON, getBorderColor(), 0, _roundRadius, false, false, false, true, _zIndex,  1);
 
-        arrowImageUp   = FastDevRKCustomUILib.addImage("spinner_" + _name + "_imageArrowUp", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, zIndex, localZIndex + 2);
-        arrowImageDown = FastDevRKCustomUILib.addImage("spinner_" + _name + "_imageArrowDown", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, zIndex, localZIndex + 2);
+        arrowImageUp   = FastDevRKCustomUILib.addImage("spinner_" + _name + "_imageArrowUp", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_UP), 0, 0, 0, 0, getZIndex(), getLocalZIndex() + 2);
+        arrowImageDown = FastDevRKCustomUILib.addImage("spinner_" + _name + "_imageArrowDown", FastDevRKCustomUILib.getDefaultImageName(FastDevRKCustomUILib.DefaultImages.ARROW_DOWN), 0, 0, 0, 0, getZIndex(), getLocalZIndex() + 2);
     }
 
     @Override
     public void update(float _delta, boolean[][] _pointersStates) {
-        if (alpha > 0 && localAlpha > 0) {
-            isInFocus = (spinnerLabel.isInFocus() || spinnerRect.isInFocus());
+        if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
+            setIsInFocus(spinnerLabel.isInFocus() || spinnerRect.isInFocus());
+
+            updateElements();
 
             spinnerLabel.setText( (value == 0 ? "0" : String.valueOf(value)) );
 
-            fontColor.a = Math.min(localAlpha, alpha);
-            fillColor.a = Math.min(localAlpha, alpha);
-            if (borderColor != null) borderColor.a = Math.min(localAlpha, alpha);
+            spinnerRect.setSize(getWidth(), getHeight());
+            spinnerRect.setPosition(getX(), getY());
 
-            spinnerLabel.setFillColor(fontColor);
+            fontColor.a = Math.min(getAlpha(), getLocalAlpha());
+            spinnerLabel.setFontColor(fontColor);
             spinnerLabel.setPosition(spinnerRect.getX() + (spinnerRect.getWidth() - spinnerLabel.getWidth()) / 2f, spinnerRect.getY() + (spinnerRect.getHeight() - spinnerLabel.getHeight()) / 2f);
+
+            float borderSize = getBorderSize();
 
             // arrows (rect-buttons and images)
             arrowRectUp.setPosition(spinnerRect.getX() + (spinnerRect.getWidth() - arrowsButtonsWidth) - borderSize, getY() + (spinnerRect.getHeight() - arrowRectUp.getHeight()) - borderSize);
@@ -106,24 +97,45 @@ public class RKSpinner implements IRKUIElement {
 
                 value = Math.max(Math.min(MathPlus.roundTo(value, 4), maxValue), minValue);
             }
-            if (isInFocus) {
-                borderColor = GlobalColorsDark.DARK_COLOR_SPINNER_FOCUS_BORDER;
+            if (isInFocus()) {
+                setBorderColor(GlobalColorsDark.DARK_COLOR_SPINNER_FOCUS_BORDER);
             } else {
-                fillColor   = GlobalColorsDark.DARK_COLOR_SPINNER.cpy();
-                borderColor = GlobalColorsDark.DARK_COLOR_SPINNER_BORDER.cpy();
+                setFillColor(GlobalColorsDark.DARK_COLOR_SPINNER);
+                setBorderColor(GlobalColorsDark.DARK_COLOR_SPINNER_BORDER);
             }
 
-            spinnerRect.setFillColor(fillColor);
-            spinnerRect.setBorderColor(borderColor);
+            spinnerRect.setFillColor(getFillColor());
+            spinnerRect.setBorderColor(getBorderColor());
         }
     }
 
+    private void updateElements() {
+        float alpha = getAlpha();
+        int zIndex  = getZIndex();
+
+        spinnerRect.setAlpha(alpha);
+        spinnerLabel.setAlpha(alpha);
+        arrowRectDown.setAlpha(alpha);
+        arrowRectUp.setAlpha(alpha);
+        arrowImageUp.setAlpha(alpha);
+        arrowImageDown.setAlpha(alpha);
+
+        spinnerRect.setZIndex(zIndex);
+        spinnerLabel.setZIndex(zIndex);
+        arrowRectDown.setZIndex(zIndex);
+        arrowRectUp.setZIndex(zIndex);
+        arrowImageUp.setZIndex(zIndex);
+        arrowImageDown.setZIndex(zIndex);
+    }
+
     @Override
-    public void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha) {
-        if (alpha > 0 && localAlpha > 0) {
+    public void draw(Batch _batch, ShapeRenderer _shapeRenderer) {
+        if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             _batch.end();
             _shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             DrawingTools.enableGLBlend();
+
+            float borderSize = getBorderSize();
 
             _shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_SPINNER_BORDER);
             _shapeRenderer.rectLine(arrowRectDown.getX() - borderSize / 2f, arrowRectDown.getY(), arrowRectDown.getX() - borderSize / 2f, arrowRectDown.getY() + (getHeight() - borderSize * 2f), borderSize);
@@ -133,186 +145,5 @@ public class RKSpinner implements IRKUIElement {
             DrawingTools.disableGLBlend();
             _batch.begin();
         }
-    }
-
-    @Override
-    public void setVisible(boolean _isVisible) {
-        isVisible = _isVisible;
-
-        spinnerRect.setVisible(_isVisible);
-        spinnerLabel.setVisible(_isVisible);
-        arrowRectDown.setVisible(_isVisible);
-        arrowRectUp.setVisible(_isVisible);
-        arrowImageUp.setVisible(_isVisible);
-        arrowImageDown.setVisible(_isVisible);
-    }
-
-    @Override
-    public void setIsPointerHover(boolean _isPointerHover) {
-        isPointerHover = _isPointerHover;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    @Override
-    public boolean isPointerHover() {
-        return isPointerHover;
-    }
-
-    @Override
-    public void setPosition(float _x, float _y) {
-        spinnerRect.setPosition(_x, _y);
-    }
-
-    @Override
-    public void setX(float _x) {
-        spinnerRect.setX(_x);
-    }
-
-    @Override
-    public void setY(float _y) {
-        spinnerRect.setY(_y);
-    }
-
-    @Override
-    public void setSize(float _w, float _h) {
-        spinnerRect.setSize(_w, _h);
-    }
-
-    @Override
-    public void setWidth(float _w) {
-        spinnerRect.setWidth(_w);
-    }
-
-    @Override
-    public void setHeight(float _h) {
-        spinnerRect.setHeight(_h);
-    }
-
-    @Override
-    public void setFillColor(Color _color) {
-        fillColor = _color.cpy();
-    }
-
-    @Override
-    public void setBorderColor(Color _color) {
-        borderColor = _color.cpy();
-    }
-
-    @Override
-    public void setAlpha(float _alpha) {
-        alpha = _alpha;
-
-        spinnerRect.setAlpha(_alpha);
-        spinnerLabel.setAlpha(_alpha);
-        arrowRectDown.setAlpha(_alpha);
-        arrowRectUp.setAlpha(_alpha);
-        arrowImageUp.setAlpha(_alpha);
-        arrowImageDown.setAlpha(_alpha);
-    }
-
-    @Override
-    public void setLocalAlpha(float _localAlpha) {
-        localAlpha = _localAlpha;
-
-        spinnerRect.setLocalAlpha(_localAlpha);
-        spinnerLabel.setLocalAlpha(_localAlpha);
-        arrowRectDown.setLocalAlpha(_localAlpha);
-        arrowRectUp.setLocalAlpha(_localAlpha);
-        arrowImageUp.setLocalAlpha(_localAlpha);
-        arrowImageDown.setLocalAlpha(_localAlpha);
-    }
-
-    @Override
-    public void setZIndex(int _zIndex) {
-        zIndex = _zIndex;
-    }
-
-    @Override
-    public void setIsInFocus(boolean _isInFocus) {
-        isInFocus = _isInFocus;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Vector2 getPosition() {
-        return spinnerRect.getPosition();
-    }
-
-    @Override
-    public float getX() {
-        return spinnerRect.getX();
-    }
-
-    @Override
-    public float getY() {
-        return spinnerRect.getY();
-    }
-
-    @Override
-    public Vector2 getSize() {
-        return spinnerRect.getSize();
-    }
-
-    @Override
-    public float getWidth() {
-        return spinnerRect.getWidth();
-    }
-
-    @Override
-    public float getHeight() {
-        return spinnerRect.getHeight();
-    }
-
-    @Override
-    public Color getFillColor() {
-        return fillColor;
-    }
-
-    @Override
-    public Color getBorderColor() {
-        return borderColor;
-    }
-
-    @Override
-    public float getAlpha() {
-        return alpha;
-    }
-
-    @Override
-    public float getLocalAlpha() {
-        return localAlpha;
-    }
-
-    @Override
-    public String getType() {
-        return "spinner";
-    }
-
-    @Override
-    public int getZIndex() {
-        return zIndex;
-    }
-
-    @Override
-    public int getLocalZIndex() {
-        return localZIndex;
-    }
-
-    @Override
-    public boolean isInFocus() {
-        return isInFocus;
-    }
-
-    @Override
-    public void dispose() {
-        //
     }
 }

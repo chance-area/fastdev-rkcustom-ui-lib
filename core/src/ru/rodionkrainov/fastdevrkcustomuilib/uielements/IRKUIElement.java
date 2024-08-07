@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public interface IRKUIElement {
     void update(float _delta, boolean[][] _pointersStates);
-    void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha);
+    void draw(Batch _batch, ShapeRenderer _shapeRenderer);
 
     void setVisible(boolean _isVisible);
     void setIsPointerHover(boolean _isPointerHover);
@@ -22,6 +22,7 @@ public interface IRKUIElement {
     void setHeight(float _h);
     void setFillColor(Color _color);
     void setBorderColor(Color _color);
+    void setBorderSize(float _size);
     void setAlpha(float _alpha);
     void setLocalAlpha(float _localAlpha);
     void setZIndex(int _zIndex);
@@ -31,11 +32,11 @@ public interface IRKUIElement {
     Vector2 getPosition();
     float getX();
     float getY();
-    Vector2 getSize();
     float getWidth();
     float getHeight();
     Color getFillColor();
     Color getBorderColor();
+    float getBorderSize();
     float getAlpha();
     float getLocalAlpha();
 

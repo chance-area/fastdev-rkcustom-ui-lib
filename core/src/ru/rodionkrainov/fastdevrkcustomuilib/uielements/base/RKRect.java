@@ -4,27 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 
-import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
 
-public class RKRect implements IRKUIElement {
-    private String name;
-    private int zIndex;
-    private final int localZIndex;
-    private boolean isVisible = true;
-    private boolean isPointerHover = false;
-    private boolean isInFocus = false;
-
-    private Color fillColor;
-    private Color borderColor;
-    private float alpha      = 1f;
-    private float localAlpha = 1f;
-    private float borderSize;
-
-    private int arcSegments = 32;
-    private float roundRadius;
+public class RKRect extends RKCustomElement {
+    private final float roundRadius;
     private boolean isRoundRadiusTopLeft;
     private boolean isRoundRadiusTopRight;
     private boolean isRoundRadiusBottomLeft;
@@ -36,13 +21,11 @@ public class RKRect implements IRKUIElement {
     private final Rectangle rectangle;
 
     public RKRect(String _name, float _posX, float _posY, float _w, float _h, Color _fillColor, Color _borderColor, float _borderSize, float _roundRadius, boolean _isRoundRadiusTopLeft, boolean _isRoundRadiusTopRight, boolean _isRoundRadiusBottomLeft, boolean _isRoundRadiusBottomRight, int _zIndex, int _localZIndex) {
-        name   = _name;
-        zIndex = _zIndex;
-        localZIndex = _localZIndex;
+        super(_name, "rect", _w, _h, _posX, _posY, 1f, 1f, _zIndex, _localZIndex);
 
-        fillColor   = _fillColor.cpy();
-        borderColor = (_borderColor != null ? _borderColor.cpy() : null);
-        borderSize  = _borderSize;
+        setFillColor(_fillColor);
+        setBorderColor(_borderColor);
+        setBorderSize(_borderSize);
 
         roundRadius              = _roundRadius;
         isRoundRadiusTopLeft     = _isRoundRadiusTopLeft;
@@ -55,26 +38,28 @@ public class RKRect implements IRKUIElement {
 
     @Override
     public void update(float _delta, boolean[][] _pointersStates) {
-        if (alpha > 0 && localAlpha > 0) {
-            fillColor.a = Math.min(alpha, localAlpha);
-            if (borderColor != null) borderColor.a = Math.min(alpha, localAlpha);
+        if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
+            rectangle.setSize(getWidth(), getHeight());
+            rectangle.setPosition(getX(), getY());
         }
     }
 
     @Override
-    public void draw(Batch _batch, ShapeRenderer _shapeRenderer, float _parentAlpha) {
-        if (alpha > 0 && localAlpha > 0) {
+    public void draw(Batch _batch, ShapeRenderer _shapeRenderer) {
+        if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             _batch.end();
             _shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             DrawingTools.enableGLBlend();
 
-            _shapeRenderer.setColor(fillColor);
+            float borderSize = getBorderSize();
+
+            _shapeRenderer.setColor(getFillColor());
             if (!isRoundRadiusTopLeft && !isRoundRadiusTopRight && !isRoundRadiusBottomLeft && !isRoundRadiusBottomRight) {
-                if (borderSize > 0 && borderColor != null) {
-                    _shapeRenderer.setColor(borderColor);
+                if (borderSize > 0 && getBorderColor() != null) {
+                    _shapeRenderer.setColor(getBorderColor());
                     _shapeRenderer.rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
 
-                    _shapeRenderer.setColor(fillColor);
+                    _shapeRenderer.setColor(getFillColor());
                     if (isBorderDown && isBorderUp) _shapeRenderer.rect(rectangle.getX() + borderSize, rectangle.getY() + borderSize, rectangle.getWidth() - borderSize * 2f, rectangle.getHeight() - borderSize * 2f);
                     else                            _shapeRenderer.rect(rectangle.getX() + borderSize, rectangle.getY(), rectangle.getWidth() - borderSize * 2f, rectangle.getHeight());
                 } else {
@@ -86,11 +71,11 @@ public class RKRect implements IRKUIElement {
                 float width = rectangle.getWidth();
                 float height = rectangle.getHeight();
 
-                if (borderSize > 0 && borderColor != null) {
-                    _shapeRenderer.setColor(borderColor);
+                if (borderSize > 0 && getBorderColor() != null) {
+                    _shapeRenderer.setColor(getBorderColor());
                     drawRoundedRect(_shapeRenderer, posX, posY, width, height, roundRadius);
 
-                    _shapeRenderer.setColor(fillColor);
+                    _shapeRenderer.setColor(getFillColor());
                     if (isBorderDown && isBorderUp) drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize * 2, (roundRadius - borderSize));
                     else if (isBorderDown)          drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize, (roundRadius - borderSize));
                     else if (isBorderUp)            drawRoundedRect(_shapeRenderer, posX + borderSize, posY, width - borderSize * 2, height - borderSize, (roundRadius - borderSize));
@@ -107,6 +92,8 @@ public class RKRect implements IRKUIElement {
     }
 
     private void drawRoundedRect(ShapeRenderer _shapeRenderer, float _posX, float _posY, float _width, float _height, float _radius) {
+        int arcSegments = 32;
+
         _shapeRenderer.rect(_posX + _radius, _posY + _radius, _width - _radius * 2f, _height - _radius * 2f);
 
         if (isRoundRadiusTopLeft) {
@@ -130,11 +117,17 @@ public class RKRect implements IRKUIElement {
         } else _shapeRenderer.rect(_posX + _width - _radius, _posY, _radius, _height - _radius);
     }
 
-    public void setIsRoundRadiusBottomLeft(boolean _isBoundRadiusBottomLeft) {
-        isRoundRadiusBottomLeft = _isBoundRadiusBottomLeft;
+    public void setIsRoundRadiusTopLeft(boolean _isRoundRadiusTopLeft) {
+        isRoundRadiusTopLeft = _isRoundRadiusTopLeft;
     }
-    public void setIsRoundRadiusBottomRight(boolean _isBoundRadiusBottomRight) {
-        isRoundRadiusBottomRight = _isBoundRadiusBottomRight;
+    public void setIsRoundRadiusTopRight(boolean _isRoundRadiusTopRight) {
+        isRoundRadiusTopRight = _isRoundRadiusTopRight;
+    }
+    public void setIsRoundRadiusBottomLeft(boolean _isRoundRadiusBottomLeft) {
+        isRoundRadiusBottomLeft = _isRoundRadiusBottomLeft;
+    }
+    public void setIsRoundRadiusBottomRight(boolean _isRoundRadiusBottomRight) {
+        isRoundRadiusBottomRight = _isRoundRadiusBottomRight;
     }
 
     public void setIsBorderDown(boolean _isBorderDown) {
@@ -142,167 +135,5 @@ public class RKRect implements IRKUIElement {
     }
     public void setIsBorderUp(boolean _isBorderUp) {
         isBorderUp = _isBorderUp;
-    }
-
-    @Override
-    public void setVisible(boolean _isVisible) {
-        isVisible = _isVisible;
-    }
-
-    @Override
-    public void setIsPointerHover(boolean _isPointerHover) {
-        isPointerHover = _isPointerHover;
-    }
-
-    @Override
-    public boolean isVisible() {
-        return isVisible;
-    }
-
-    @Override
-    public boolean isPointerHover() {
-        return isPointerHover;
-    }
-
-    @Override
-    public void setPosition(float _x, float _y) {
-        rectangle.setPosition(_x, _y);
-    }
-
-    @Override
-    public void setX(float _x) {
-        rectangle.setX(_x);
-    }
-
-    @Override
-    public void setY(float _y) {
-        rectangle.setY(_y);
-    }
-
-    @Override
-    public void setSize(float _w, float _h) {
-        rectangle.setSize(_w, _h);
-    }
-
-    @Override
-    public void setWidth(float _w) {
-        rectangle.setWidth(_w);
-    }
-
-    @Override
-    public void setHeight(float _h) {
-        rectangle.setHeight(_h);
-    }
-
-    @Override
-    public void setFillColor(Color _color) {
-        fillColor = _color.cpy();
-        fillColor.a = Math.min(alpha, localAlpha);
-    }
-
-    @Override
-    public void setBorderColor(Color _color) {
-        borderColor = _color.cpy();
-        borderColor.a = Math.min(alpha, localAlpha);
-    }
-
-    @Override
-    public void setAlpha(float _alpha) {
-        alpha = _alpha;
-    }
-
-    @Override
-    public void setLocalAlpha(float _localAlpha) {
-        localAlpha = _localAlpha;
-    }
-
-    @Override
-    public void setZIndex(int _zIndex) {
-        zIndex = _zIndex;
-    }
-
-    @Override
-    public void setIsInFocus(boolean _isInFocus) {
-        isInFocus = _isInFocus;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Vector2 getPosition() {
-        return (new Vector2(rectangle.getX(), rectangle.getY()));
-    }
-
-    @Override
-    public float getX() {
-        return rectangle.getX();
-    }
-
-    @Override
-    public float getY() {
-        return rectangle.getY();
-    }
-
-    @Override
-    public Vector2 getSize() {
-        return (new Vector2(rectangle.getWidth(), rectangle.getHeight()));
-    }
-
-    @Override
-    public float getWidth() {
-        return rectangle.getWidth();
-    }
-
-    @Override
-    public float getHeight() {
-        return rectangle.getHeight();
-    }
-
-    @Override
-    public Color getFillColor() {
-        return fillColor;
-    }
-
-    @Override
-    public Color getBorderColor() {
-        return borderColor;
-    }
-
-    @Override
-    public float getAlpha() {
-        return alpha;
-    }
-
-    @Override
-    public float getLocalAlpha() {
-        return localAlpha;
-    }
-
-    @Override
-    public String getType() {
-        return "rect";
-    }
-
-    @Override
-    public int getZIndex() {
-        return zIndex;
-    }
-
-    @Override
-    public int getLocalZIndex() {
-        return localZIndex;
-    }
-
-    @Override
-    public boolean isInFocus() {
-        return isInFocus;
-    }
-
-    @Override
-    public void dispose() {
-        // TODO
     }
 }

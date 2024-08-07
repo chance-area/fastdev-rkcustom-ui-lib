@@ -5,17 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -26,6 +17,7 @@ import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKButton;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKDropdownList;
+import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKLabel;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKRadioBox;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKSpinner;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKTabPanelsManager;
@@ -42,12 +34,13 @@ public class TestsUIElements extends ApplicationAdapter {
     private boolean isUIElementsInit = false;
 
     /* ------------------- Elements names (constants) ------------------- */
-    private final String nameLabelFPS = "label_fps";
-    private final String nameLabelExampleOne = "label_example_one";
-    private final String nameLabelExampleTwo = "label_example_two";
+    private RKLabel labelFPS;
+
+    private RKLabel labelExampleOne; // in tabPanelsMangerTwo (first tab)
+    private RKLabel labelExampleTwo; // in tabPanelsMangerTwo (second tab)
 
     private RKTabPanelsManager tabPanelsManagerOne; // main
-    private RKTabPanelsManager tabPanelsManagerTwo;
+    private RKTabPanelsManager tabPanelsManagerTwo; // in main (first tab)
     private RKButton buttonOne;
     private RKButton buttonTwo;
     private RKSpinner spinnerOne;
@@ -69,8 +62,8 @@ public class TestsUIElements extends ApplicationAdapter {
 
     @Override
     public void create() {
-        OrthographicCamera ortCamera   = new OrthographicCamera(windowWidth, windowHeight);
-        Viewport extViewport = new ExtendViewport(ortCamera.viewportWidth, ortCamera.viewportHeight, ortCamera);
+        OrthographicCamera ortCamera = new OrthographicCamera(windowWidth, windowHeight);
+        Viewport extViewport         = new ExtendViewport(ortCamera.viewportWidth, ortCamera.viewportHeight, ortCamera);
 
         extViewport.apply(true);
         ortCamera.position.set(ortCamera.viewportWidth / 2f, ortCamera.viewportHeight / 2f, 0);
@@ -80,7 +73,7 @@ public class TestsUIElements extends ApplicationAdapter {
         Gdx.input.setCatchKey(Input.Keys.BACK, true);
 
         // ------------ ### Init lib ### ------------
-        // format: {'name', 'path to file'}
+        // format: {"img name", "path to file (png / jpg)"}
         String[][] imagesNamesPath = new String[][] {
                 //
         };
@@ -88,12 +81,11 @@ public class TestsUIElements extends ApplicationAdapter {
     }
 
     private void initUIElements() {
-        FastDevRKCustomUILib.addLabel(nameLabelFPS, "FPS: --", GlobalColorsDark.DARK_COLOR_WHITE, (isDesktop ? 14 : 18), 999);
-        //FastDevRKCustomUILib.setZIndex(nameLabelFPS, 999);
+        labelFPS = FastDevRKCustomUILib.addLabel("label_fps", "FPS: --", GlobalColorsDark.DARK_COLOR_WHITE, (isDesktop ? 14 : 18), 999);
 
         // add base elements
-        FastDevRKCustomUILib.addLabel(nameLabelExampleOne, "Пример текста («первый»)", GlobalColorsDark.DARK_COLOR_RED, (isDesktop ? 20 : 22), 3);
-        FastDevRKCustomUILib.addLabel(nameLabelExampleTwo, "Пример текста («второй»)", GlobalColorsDark.DARK_COLOR_GREEN, (isDesktop ? 20 : 22), 3);
+        labelExampleOne = FastDevRKCustomUILib.addLabel("label_example_one", "Пример текста («первый»)", GlobalColorsDark.DARK_COLOR_RED, (isDesktop ? 20 : 22), 3);
+        labelExampleTwo = FastDevRKCustomUILib.addLabel("label_example_two", "Пример текста («второй»)", GlobalColorsDark.DARK_COLOR_GREEN, (isDesktop ? 20 : 22), 3);
 
         buttonOne = FastDevRKCustomUILib.addButton("simple_button_1", "Кнопка 1", GlobalColorsDark.DARK_COLOR_WHITE, 24, 200, 100, 130, 50, 2, 6f, (_self) -> {
             _self.setFontColor(GlobalColorsDark.DARK_COLOR_GREEN);
@@ -103,7 +95,7 @@ public class TestsUIElements extends ApplicationAdapter {
             _self.setFontColor(GlobalColorsDark.DARK_COLOR_GREEN);
             _self.setText("Нажата!");
         }, 3);
-        buttonOne.setAlpha(0.7f);
+        buttonOne.setAlpha(0.6f);
         buttonTwo.setAlpha(1f);
 
         spinnerOne = FastDevRKCustomUILib.addSpinner("simple_spinner_1", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 400, 320, 52, 2f, 6f, 3);
@@ -134,8 +126,8 @@ public class TestsUIElements extends ApplicationAdapter {
         tabPanelsManagerOne.attachElementsToTabPanel("base_elements", new IRKUIElement[]{tabPanelsManagerTwo, buttonOne, buttonTwo, spinnerOne, spinnerTwo});
 
         // attach elements to mini tabPanelsManager (2)
-        tabPanelsManagerTwo.attachElementsToTabPanel("example_one", new String[]{nameLabelExampleOne, dropdownListOne.getName(), dropdownListTwo.getName(), radioBox.getName()});
-        tabPanelsManagerTwo.attachElementsToTabPanel("example_two", new String[]{nameLabelExampleTwo});
+        tabPanelsManagerTwo.attachElementsToTabPanel("example_one", new String[]{labelExampleOne.getName(), dropdownListOne.getName(), dropdownListTwo.getName(), radioBox.getName()});
+        tabPanelsManagerTwo.attachElementsToTabPanel("example_two", new String[]{labelExampleTwo.getName()});
 
         isUIElementsInit = true;
     }
@@ -159,18 +151,22 @@ public class TestsUIElements extends ApplicationAdapter {
                 if (!isUIElementsInit) initUIElements();
 
                 // FPS
-                FastDevRKCustomUILib.setLabelText(nameLabelFPS, "FPS: " + Gdx.app.getGraphics().getFramesPerSecond());
-                FastDevRKCustomUILib.setPosition(nameLabelFPS, (windowWidth - FastDevRKCustomUILib.getSize(nameLabelFPS).x) - (isDesktop ? 12 : 30), (isDesktop) ? (34 - FastDevRKCustomUILib.getSize(nameLabelFPS).y) / 2f : ((36 - FastDevRKCustomUILib.getSize(nameLabelFPS).y) / 2f) + 0.7f);
+                labelFPS.setText("FPS: " + Gdx.app.getGraphics().getFramesPerSecond());
+                labelFPS.setPosition((windowWidth - labelFPS.getWidth()) - (isDesktop ? 12 : 30), (isDesktop) ? (34 - labelFPS.getHeight()) / 2f : ((36 - labelFPS.getHeight()) / 2f) + 0.7f);
 
-                // Example
-                FastDevRKCustomUILib.setPosition(nameLabelExampleOne, (windowWidth - FastDevRKCustomUILib.getSize(nameLabelExampleOne).x) / 2f + 100, 200);
-                FastDevRKCustomUILib.setPosition(nameLabelExampleTwo, (windowWidth - FastDevRKCustomUILib.getSize(nameLabelExampleTwo).x) / 2f + 100, 300);
+                // Example labels
+                labelExampleOne.setPosition((windowWidth - labelExampleOne.getWidth()) / 2f + 100, 200);
+                labelExampleTwo.setPosition((windowWidth - labelExampleTwo.getWidth()) / 2f + 100, 200);
+
+                // main tab panels manager
                 tabPanelsManagerOne.setSize(windowWidth, windowHeight - tabPanelsManagerOne.getTabHeight());
                 tabPanelsManagerOne.setPosition(0, 0);
 
+                // in main
                 tabPanelsManagerTwo.setSize((isDesktop ? 520 : 600), 530);
                 tabPanelsManagerTwo.setPosition(windowWidth * 0.45f, ((tabPanelsManagerOne.getHeight() - tabPanelsManagerOne.getTabHeight()) - tabPanelsManagerTwo.getHeight()) / 2f);
 
+                // buttons
                 if (!buttonOne.isInFocus()) {
                     buttonOne.setFontColor(GlobalColorsDark.DARK_COLOR_WHITE);
                     buttonOne.setText("Кнопка 1");
@@ -180,6 +176,7 @@ public class TestsUIElements extends ApplicationAdapter {
                     buttonTwo.setText("Кнопка 2");
                 }
 
+                // radio boxes
                 if (radioBox.getSelectedElementIndex() == 0) {
                     dropdownListOne.setVisible(true);
                     dropdownListTwo.setVisible(true);

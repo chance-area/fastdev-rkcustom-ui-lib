@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 
-public class CustomInputProcessorUI implements InputProcessor {
+public final class CustomInputProcessorUI implements InputProcessor {
     private final boolean isDesktop;
 
     private int numIterationsToResetDownVPos = -1; // only for mobile (android and ios)
