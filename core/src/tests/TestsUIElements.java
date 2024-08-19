@@ -5,10 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 import javax.swing.JFrame;
 
@@ -30,8 +27,6 @@ public class TestsUIElements extends ApplicationAdapter {
     public static int windowHeight = 720;
 
     public static InputMultiplexer inputMultiplexer;
-
-    private boolean isUIElementsInit = false;
 
     /* ------------------- Elements names (constants) ------------------- */
     private RKLabel labelFPS;
@@ -62,12 +57,6 @@ public class TestsUIElements extends ApplicationAdapter {
 
     @Override
     public void create() {
-        OrthographicCamera ortCamera = new OrthographicCamera(windowWidth, windowHeight);
-        Viewport extViewport         = new ExtendViewport(ortCamera.viewportWidth, ortCamera.viewportHeight, ortCamera);
-
-        extViewport.apply(true);
-        ortCamera.position.set(ortCamera.viewportWidth / 2f, ortCamera.viewportHeight / 2f, 0);
-
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
         Gdx.input.setCatchKey(Input.Keys.BACK, true);
@@ -77,7 +66,8 @@ public class TestsUIElements extends ApplicationAdapter {
         String[][] imagesNamesPath = new String[][] {
                 //
         };
-        FastDevRKCustomUILib.initLib(extViewport, inputMultiplexer, windowWidth, windowHeight, isDesktop, superDuperJFrame, "fonts/ubuntu/ubuntu-regular.ttf", 0f, 2, "png", imagesNamesPath, false);
+        FastDevRKCustomUILib.initLib(inputMultiplexer, windowWidth, windowHeight, isDesktop, superDuperJFrame, "fonts/ubuntu/ubuntu-regular.ttf", 0f, 2, "png", imagesNamesPath, false);
+        FastDevRKCustomUILib.onInitAndResLoaded(this::initUIElements);
     }
 
     private void initUIElements() {
@@ -129,7 +119,7 @@ public class TestsUIElements extends ApplicationAdapter {
         tabPanelsManagerTwo.attachElementsToTabPanel("example_one", new String[]{labelExampleOne.getName(), dropdownListOne.getName(), dropdownListTwo.getName(), radioBox.getName()});
         tabPanelsManagerTwo.attachElementsToTabPanel("example_two", new String[]{labelExampleTwo.getName()});
 
-        isUIElementsInit = true;
+        radioBox.setVisible(false);
     }
 
     @Override
@@ -140,7 +130,7 @@ public class TestsUIElements extends ApplicationAdapter {
         windowWidth  = FastDevRKCustomUILib.getWindowWidth();
         windowHeight = FastDevRKCustomUILib.getWindowHeight();
 
-        HdpiUtils.glViewport((int) (_width / 2f), (int) (_height / 2f), _width, _height);
+        HdpiUtils.glViewport((int) (windowWidth / 2f), (int) (windowHeight / 2f), windowWidth, windowHeight);
     }
 
     private void update(float _deltaTime) {
@@ -148,8 +138,6 @@ public class TestsUIElements extends ApplicationAdapter {
 
         if (FastDevRKCustomUILib.isLibInit()) {
             if (FastDevRKCustomUILib.isAllResLoaded()) {
-                if (!isUIElementsInit) initUIElements();
-
                 // FPS
                 labelFPS.setText("FPS: " + Gdx.app.getGraphics().getFramesPerSecond());
                 labelFPS.setPosition((windowWidth - labelFPS.getWidth()) - (isDesktop ? 12 : 30), (isDesktop) ? (34 - labelFPS.getHeight()) / 2f : ((36 - labelFPS.getHeight()) / 2f) + 0.7f);
@@ -178,11 +166,11 @@ public class TestsUIElements extends ApplicationAdapter {
 
                 // radio boxes
                 if (radioBox.getSelectedElementIndex() == 0) {
-                    dropdownListOne.setVisible(true);
-                    dropdownListTwo.setVisible(true);
+                    //dropdownListOne.setVisible(true);
+                    //dropdownListTwo.setVisible(true);
                 } else {
-                    dropdownListOne.setVisible(false);
-                    dropdownListTwo.setVisible(false);
+                    //dropdownListOne.setVisible(false);
+                    //dropdownListTwo.setVisible(false);
                 }
 
                 if (!FastDevRKCustomUILib.isLoadingLineVisible()) FastDevRKCustomUILib.hideLoadingLine();

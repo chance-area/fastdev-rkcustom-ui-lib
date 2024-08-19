@@ -41,8 +41,8 @@ public class DesktopLauncher extends JFrame {
 
 	private LwjglApplicationConfiguration getAppConfig() {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width         = (int) TestsUIElements.windowWidth;
-		config.height        = (int) TestsUIElements.windowHeight;
+		config.width         = TestsUIElements.windowWidth;
+		config.height        = TestsUIElements.windowHeight;
 		config.resizable     = false;
 		config.vSyncEnabled  = true;
 		config.forceExit     = false;

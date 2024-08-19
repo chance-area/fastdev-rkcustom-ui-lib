@@ -1,10 +1,12 @@
 package ru.rodionkrainov.fastdevrkcustomuilib.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 
@@ -24,7 +26,7 @@ public final class CustomInputProcessorUI implements InputProcessor {
     }
 
     public static Vector3 unproject(float _x, float _y) {
-        if (FastDevRKCustomUILib.isLibInit()) return FastDevRKCustomUILib.getStage().getCamera().unproject(new Vector3(_x, _y, 0));
+        if (FastDevRKCustomUILib.isLibInit()) return Objects.requireNonNull(FastDevRKCustomUILib.getCamera()).unproject(new Vector3(_x, _y, 0));
         else return new Vector3(-1, -1, -1);
     }
 
@@ -45,6 +47,8 @@ public final class CustomInputProcessorUI implements InputProcessor {
 
     @Override
     public boolean touchDown(int _screenX, int _screenY, int _pointer, int button) {
+        Gdx.input.setOnscreenKeyboardVisible(false);
+
         Vector3 unprojectV = unproject(_screenX, _screenY);
         vPointerDownPosition.set(unprojectV.x, unprojectV.y);
 

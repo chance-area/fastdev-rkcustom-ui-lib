@@ -14,24 +14,22 @@ package ru.rodionkrainov.fastdevrkcustomuilib;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Objects;
 
 import javax.swing.JFrame;
 
@@ -54,15 +52,17 @@ public final class FastDevRKCustomUILib {
     private static boolean IS_DESKTOP;
     private static JFrame JFRAME;
 
-    private static Stage stageUILIb;
     private static CustomInputProcessorUI customInputProcessorUI;
 
     private static Batch batch;
     private static ShapeRenderer shapeRenderer;
 
+    private static OrthographicCamera ortCamera;
+    private static ExtendViewport extViewport;
     private static int windowWidth;
     private static int windowHeight;
 
+    private static IOnInitAndResLoadedEvent onInitAndResLoadedEvent = null;
     private static boolean isLibInit           = false;
     private static boolean isAllResLoaded      = false;
     private static boolean isCanShowUIElements = false;
@@ -91,19 +91,12 @@ public final class FastDevRKCustomUILib {
 
     private FastDevRKCustomUILib() { /* ...ignore... */ }
 
-    public static void initLib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine) {
+    public static void initLib(InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine) {
         if (!isLibInit) {
-            stageUILIb = new Stage(_viewport);
-            stageUILIb.getRoot().addCaptureListener(new InputListener() {
-                @Override
-                public boolean touchDown (InputEvent _event, float _x, float _y, int _pointer, int _button) {
-                    _event.getStage().setKeyboardFocus(null);
-                    Gdx.input.setOnscreenKeyboardVisible(false);
-
-                    return false;
-                }
-            });
-            _inputMultiplexer.addProcessor(stageUILIb);
+            ortCamera   = new OrthographicCamera(_windowWidth, _windowHeight);
+            extViewport = new ExtendViewport(ortCamera.viewportWidth, ortCamera.viewportHeight, ortCamera);
+            extViewport.apply(true);
+            ortCamera.position.set(ortCamera.viewportWidth / 2f, ortCamera.viewportHeight / 2f, 0);
 
             customInputProcessorUI = new CustomInputProcessorUI(_isDesktop);
             _inputMultiplexer.addProcessor(customInputProcessorUI);
@@ -139,11 +132,40 @@ public final class FastDevRKCustomUILib {
             isLibInit = true;
         }
     }
-    public static void initLib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, boolean _isShowLoadingLine) {
-        initLib(_viewport, _inputMultiplexer, _windowWidth, _windowHeight, _isDesktop, _jframe, _fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, _isShowLoadingLine);
+    public static void initLib(InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, boolean _isShowLoadingLine) {
+        initLib(_inputMultiplexer, _windowWidth, _windowHeight, _isDesktop, _jframe, _fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, _isShowLoadingLine);
     }
-    public static void initLib(Viewport _viewport, InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX) {
-        initLib(_viewport, _inputMultiplexer, _windowWidth, _windowHeight, _isDesktop, _jframe, _fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, true);
+    public static void initLib(InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX) {
+        initLib(_inputMultiplexer, _windowWidth, _windowHeight, _isDesktop, _jframe, _fontFilePath, _fontBorderWidth, _fontSpaceX, null, null, true);
+    }
+
+    public static void onInitAndResLoaded(IOnInitAndResLoadedEvent _onInitAndResLoadedEvent) {
+        onInitAndResLoadedEvent = _onInitAndResLoadedEvent;
+    }
+
+
+    /* ---------------------------------------------------------
+    --------------------- SETTERS / CHANGERS -------------------
+    ------------------------------------------------------------ */
+
+    public static void resizeWindow(int _newWindowWidth, int _newWindowHeight) {
+        if (isLibInit() && _newWindowWidth != 1 && _newWindowHeight != 1) {
+            extViewport.update(_newWindowWidth, _newWindowHeight, true);
+            ortCamera.position.set(ortCamera.viewportWidth / 2f, ortCamera.viewportHeight / 2f, 0);
+
+            windowWidth  = _newWindowWidth;
+            windowHeight = _newWindowHeight;
+        }
+    }
+
+    public static void changeCursor(int _cursorType) {
+        if (isLibInit() && IS_DESKTOP && JFRAME != null) {
+            JFRAME.setCursor(new Cursor(_cursorType));
+        }
+    }
+
+    public static void hideLoadingLine() {
+        isCanShowUIElements = true;
     }
 
 
@@ -153,9 +175,8 @@ public final class FastDevRKCustomUILib {
 
     public static void update(float _delta) {
         if (isLibInit()) {
-            stageUILIb.getViewport().apply();
-            stageUILIb.getViewport().getCamera().update(true);
-            stageUILIb.act(_delta);
+            extViewport.apply();
+            ortCamera.update(true);
 
             if (!isAllResLoaded()) {
                 if (isShowLoadingLine) {
@@ -166,6 +187,7 @@ public final class FastDevRKCustomUILib {
                 }
 
                 isAllResLoaded = (getLoadingPercent() == 100f);
+                if (isAllResLoaded() && onInitAndResLoadedEvent != null) onInitAndResLoadedEvent.onInitAndResLoaded();
             } else if (isCanShowUIElements) {
                 customInputProcessorUI.update();
 
@@ -226,10 +248,9 @@ public final class FastDevRKCustomUILib {
                 Gdx.gl20.glClearColor(GlobalColorsDark.DARK_COLOR_BG.r, GlobalColorsDark.DARK_COLOR_BG.g, GlobalColorsDark.DARK_COLOR_BG.b, GlobalColorsDark.DARK_COLOR_BG.a);
                 Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
             }
-            //stageUILIb.draw();
 
-            batch.setProjectionMatrix(stageUILIb.getViewport().getCamera().combined);
-            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+            batch.setProjectionMatrix(ortCamera.combined);
+            shapeRenderer.setProjectionMatrix(ortCamera.combined);
 
             if (isAllResLoaded && isCanShowUIElements) {
                 for (IRKUIElement uiElement : arrRKUIElements) {
@@ -254,31 +275,6 @@ public final class FastDevRKCustomUILib {
                 shapeRenderer.end();
             }
         }
-    }
-
-
-    /* ---------------------------------------------------------
-    --------------------- SETTERS / CHANGERS -------------------
-    ------------------------------------------------------------ */
-
-    public static void resizeWindow(int _newWindowWidth, int _newWindowHeight) {
-        if (isLibInit()) {
-            stageUILIb.getViewport().update(_newWindowWidth, _newWindowHeight, true);
-            stageUILIb.getViewport().getCamera().position.set(stageUILIb.getViewport().getWorldWidth() / 2f, stageUILIb.getCamera().viewportHeight / 2f, 0);
-
-            windowWidth  = _newWindowWidth;
-            windowHeight = _newWindowHeight;
-        }
-    }
-
-    public static void changeCursor(int _cursorType) {
-        if (isLibInit() && IS_DESKTOP && JFRAME != null) {
-            JFRAME.setCursor(new Cursor(_cursorType));
-        }
-    }
-
-    public static void hideLoadingLine() {
-        isCanShowUIElements = true;
     }
 
 
@@ -315,8 +311,18 @@ public final class FastDevRKCustomUILib {
         return -1;
     }
 
-    public static Stage getStage() {
-        return (isLibInit() ? stageUILIb : null);
+    public static Viewport getViewport() {
+        return (isLibInit() ? extViewport : null);
+    }
+    public static ExtendViewport getExtendViewport() {
+        return (isLibInit() ? extViewport : null);
+    }
+
+    public static Camera getCamera() {
+        return (isLibInit() ? ortCamera : null);
+    }
+    public static OrthographicCamera getOrthographicCamera() {
+        return (isLibInit() ? ortCamera : null);
     }
 
     public static String getDefaultImageName(DefaultImages _defaultImgName) {
@@ -571,8 +577,6 @@ public final class FastDevRKCustomUILib {
 
     public static void dispose() {
         for (IRKUIElement uiElement : arrRKUIElements) uiElement.dispose();
-        for (Actor actor : stageUILIb.getActors()) actor.remove();
-        stageUILIb.dispose();
 
         shapeRenderer.dispose();
 

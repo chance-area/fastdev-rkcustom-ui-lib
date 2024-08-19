@@ -65,13 +65,19 @@ public class RKButton extends RKCustomElement {
     }
 
     private void updateElements() {
-        buttonLabel.setVisible(isVisible());
-        buttonRect.setVisible(isVisible());
         buttonLabel.setAlpha(getAlpha());
         buttonRect.setAlpha(getAlpha());
 
         buttonLabel.setZIndex(getZIndex());
         buttonRect.setZIndex(getZIndex());
+    }
+
+    @Override
+    public void setVisible(boolean _isVisible) {
+        super.setVisible(_isVisible);
+
+        buttonLabel.setVisible(_isVisible);
+        buttonRect.setVisible(_isVisible);
     }
 
     public void setText(String _text) {

@@ -143,14 +143,8 @@ public class RKDropdownList extends RKCustomElement {
     }
 
     private void updateElements() {
-        boolean isVisible = isVisible();
         float alpha       = getAlpha();
         int zIndex        = getZIndex();
-
-        titleRect.setVisible(isVisible);
-        titleLabel.setVisible(isVisible);
-        arrowImageUp.setVisible(isVisible);
-        arrowImageDown.setVisible(isVisible);
 
         titleRect.setAlpha(alpha);
         titleLabel.setAlpha(alpha);
@@ -164,6 +158,17 @@ public class RKDropdownList extends RKCustomElement {
 
         titleRect.setSize(getWidth(), getHeight());
         titleRect.setPosition(getX(), getY());
+    }
+
+    @Override
+    public void setVisible(boolean _isVisible) {
+        super.setVisible(_isVisible);
+
+        titleRect.setVisible(_isVisible);
+        titleLabel.setVisible(_isVisible);
+
+        arrowImageUp.setVisible((titleRect.isInFocus() || titleLabel.isInFocus()) && _isVisible);
+        arrowImageDown.setVisible(!arrowImageUp.isVisible() && _isVisible);
     }
 
     @Override

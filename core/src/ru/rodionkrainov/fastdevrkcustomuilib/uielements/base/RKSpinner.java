@@ -146,4 +146,16 @@ public class RKSpinner extends RKCustomElement {
             _batch.begin();
         }
     }
+
+    @Override
+    public void setVisible(boolean _isVisible) {
+        super.setVisible(_isVisible);
+
+        spinnerRect.setVisible(_isVisible);
+        spinnerLabel.setVisible(_isVisible);
+        arrowImageDown.setVisible(_isVisible);
+        arrowImageUp.setVisible(_isVisible);
+        arrowRectDown.setVisible(_isVisible);
+        arrowRectUp.setVisible(_isVisible);
+    }
 }

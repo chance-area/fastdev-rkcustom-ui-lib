@@ -1,5 +1,6 @@
 package ru.rodionkrainov.fastdevrkcustomuilib.uielements.base;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -157,7 +158,8 @@ public class RKTabPanelsManager extends RKCustomElement {
                         boolean isElementsVisible = arrTabs.get(i).get(0).equals(selectedTabName);
 
                         for (IRKUIElement attachElement : arrAttachElements.get(i)) {
-                            attachElement.setLocalAlpha(isElementsVisible ? attachElement.getAlpha() : 0f);
+                            //attachElement.setLocalAlpha(isElementsVisible ? attachElement.getAlpha() : 0f);
+                            attachElement.setVisible(isElementsVisible);
                         }
                     }
                 }
@@ -166,7 +168,7 @@ public class RKTabPanelsManager extends RKCustomElement {
 
             // line (selected tab) animation
             if (lineHeight_animationY != 0) {
-                lineHeight_animationY = Math.max(0, lineHeight_animationY - LINE_HEIGHT / 3.5f);
+                lineHeight_animationY = Math.max(0, lineHeight_animationY - LINE_HEIGHT / (4.6f - _delta * 100f));
             }
         }
     }
@@ -213,6 +215,8 @@ public class RKTabPanelsManager extends RKCustomElement {
 
     @Override
     public void setVisible(boolean _isVisible) {
+        super.setVisible(_isVisible);
+
         isSelectedTabChanged = true;
 
         for (int i = 0; i < arrRects.size(); i++) {

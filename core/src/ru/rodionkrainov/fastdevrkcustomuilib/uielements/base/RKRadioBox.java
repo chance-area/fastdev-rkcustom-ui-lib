@@ -46,9 +46,7 @@ public class RKRadioBox extends RKCustomElement {
 
                 label.setFillColor(fontColor);
 
-                rect.setVisible(isVisible());
                 rect.setZIndex(getZIndex());
-                label.setVisible(isVisible());
                 label.setZIndex(getZIndex());
                 rect.setAlpha(0.01f);
                 label.setAlpha(getAlpha());
@@ -100,6 +98,19 @@ public class RKRadioBox extends RKCustomElement {
             _shapeRenderer.end();
             DrawingTools.disableGLBlend();
             _batch.begin();
+        }
+    }
+
+    @Override
+    public void setVisible(boolean _isVisible) {
+        super.setVisible(_isVisible);
+
+        for (int i = 0; i < arrRects.size(); i++) {
+            RKRect rect   = arrRects.get(i);
+            RKLabel label = arrLabels.get(i);
+
+            rect.setVisible(_isVisible);
+            label.setVisible(_isVisible);
         }
     }
 
