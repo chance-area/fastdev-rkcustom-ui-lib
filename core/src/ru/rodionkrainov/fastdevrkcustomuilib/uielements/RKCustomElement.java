@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
+
 public abstract class RKCustomElement implements IRKUIElement {
     private final String NAME;
     private final String ELEMENT_TYPE;
@@ -41,7 +43,7 @@ public abstract class RKCustomElement implements IRKUIElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         // TODO
     }
 

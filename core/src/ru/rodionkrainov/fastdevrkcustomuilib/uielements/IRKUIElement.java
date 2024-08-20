@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
+
 public interface IRKUIElement {
-    void update(float _delta, boolean[][] _pointersStates);
+    void update(float _delta, PointersStates[] _pointersStates);
     void draw(Batch _batch, ShapeRenderer _shapeRenderer);
 
     void setVisible(boolean _isVisible);

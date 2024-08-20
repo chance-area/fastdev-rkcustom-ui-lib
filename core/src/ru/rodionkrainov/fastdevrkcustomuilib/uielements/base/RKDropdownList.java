@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public class RKDropdownList extends RKCustomElement {
     private int fontSize;
@@ -75,7 +76,7 @@ public class RKDropdownList extends RKCustomElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             updateElements();
 
@@ -128,7 +129,7 @@ public class RKDropdownList extends RKCustomElement {
                 elementLabel.setFontColor(fontColor);
                 elementLabel.setPosition(elementRect.getX() + (elementRect.getWidth() - elementLabel.getWidth()) / 2f, elementRect.getY() + (elementRect.getHeight() - elementLabel.getHeight()) / 2f);
 
-                if ((elementRect.isPointerHover() || elementLabel.isPointerHover()) && _pointersStates[0][0]) selectedElementText = elementLabel.getText();
+                if ((elementRect.isPointerHover() || elementLabel.isPointerHover()) && _pointersStates[0].isDown()) selectedElementText = elementLabel.getText();
             }
 
             titleLabel.setText(selectedElementText);

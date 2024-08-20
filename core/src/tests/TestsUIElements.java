@@ -129,8 +129,6 @@ public class TestsUIElements extends ApplicationAdapter {
         FastDevRKCustomUILib.resizeWindow(_width, _height);
         windowWidth  = FastDevRKCustomUILib.getWindowWidth();
         windowHeight = FastDevRKCustomUILib.getWindowHeight();
-
-        HdpiUtils.glViewport((int) (windowWidth / 2f), (int) (windowHeight / 2f), windowWidth, windowHeight);
     }
 
     private void update(float _deltaTime) {
@@ -201,7 +199,6 @@ public class TestsUIElements extends ApplicationAdapter {
     @Override
     public void dispose() {
         for (InputProcessor inputProcessor : inputMultiplexer.getProcessors()) inputMultiplexer.removeProcessor(inputProcessor);
-
-        if (FastDevRKCustomUILib.isLibInit()) FastDevRKCustomUILib.dispose();
+        FastDevRKCustomUILib.dispose();
     }
 }

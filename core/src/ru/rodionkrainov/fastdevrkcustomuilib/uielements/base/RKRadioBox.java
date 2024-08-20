@@ -12,6 +12,7 @@ import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public class RKRadioBox extends RKCustomElement {
     private Color fontColor;
@@ -38,7 +39,7 @@ public class RKRadioBox extends RKCustomElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             for (int i = 0; i < arrRects.size(); i++) {
                 RKRect rect = arrRects.get(i);
@@ -58,7 +59,7 @@ public class RKRadioBox extends RKCustomElement {
                 if (rect.isPointerHover() || label.isPointerHover()) {
                     FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
 
-                    if (_pointersStates[0][1]) selectedElementIndex = i;
+                    if (_pointersStates[0].isUp()) selectedElementIndex = i;
                 }
             }
         }

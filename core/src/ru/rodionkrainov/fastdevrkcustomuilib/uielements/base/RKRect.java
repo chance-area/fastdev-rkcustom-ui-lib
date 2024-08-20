@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public class RKRect extends RKCustomElement {
     private final float roundRadius;
@@ -37,7 +38,7 @@ public class RKRect extends RKCustomElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             rectangle.setSize(getWidth(), getHeight());
             rectangle.setPosition(getX(), getY());

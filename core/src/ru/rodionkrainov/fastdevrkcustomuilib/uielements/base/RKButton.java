@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import ru.rodionkrainov.fastdevrkcustomuilib.GlobalColorsDark;
 import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public class RKButton extends RKCustomElement {
     private final IButtonClickEvent onButtonClickEvent;
@@ -33,7 +34,7 @@ public class RKButton extends RKCustomElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             setIsInFocus((buttonLabel.isInFocus() || buttonRect.isInFocus()));
 
@@ -53,7 +54,7 @@ public class RKButton extends RKCustomElement {
                 setBorderColor(GlobalColorsDark.DARK_COLOR_BUTTON_HOVER_BORDER);
 
                 if (Gdx.input.isTouched()) setFillColor(GlobalColorsDark.DARK_COLOR_BUTTON_TOUCHED);
-                if (_pointersStates[0][1]) onButtonClickEvent.onButtonClick(this);
+                if (_pointersStates[0].isUp()) onButtonClickEvent.onButtonClick(this);
             } else {
                 setFillColor(GlobalColorsDark.DARK_COLOR_BUTTON);
                 setBorderColor(GlobalColorsDark.DARK_COLOR_BUTTON_BORDER);

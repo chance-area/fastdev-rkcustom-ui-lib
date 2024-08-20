@@ -24,12 +24,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Objects;
 
 import javax.swing.JFrame;
 
@@ -44,6 +46,7 @@ import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKRect;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKSpinner;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.base.RKTabPanelsManager;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.CustomInputProcessorUI;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public final class FastDevRKCustomUILib {
     public static final String LIB_NAME    = "FastDevRKCustomUILib";
@@ -57,7 +60,6 @@ public final class FastDevRKCustomUILib {
     private static Batch batch;
     private static ShapeRenderer shapeRenderer;
 
-    private static OrthographicCamera ortCamera;
     private static ExtendViewport extViewport;
     private static int windowWidth;
     private static int windowHeight;
@@ -93,10 +95,9 @@ public final class FastDevRKCustomUILib {
 
     public static void initLib(InputMultiplexer _inputMultiplexer, int _windowWidth, int _windowHeight, boolean _isDesktop, JFrame _jframe, String _fontFilePath, float _fontBorderWidth, int _fontSpaceX, String _pngFilesFolder, String[][] _imagesNamesPath, boolean _isShowLoadingLine) {
         if (!isLibInit) {
-            ortCamera   = new OrthographicCamera(_windowWidth, _windowHeight);
-            extViewport = new ExtendViewport(ortCamera.viewportWidth, ortCamera.viewportHeight, ortCamera);
+            extViewport = new ExtendViewport(_windowWidth, _windowHeight, (new OrthographicCamera(_windowWidth, _windowHeight)));
             extViewport.apply(true);
-            ortCamera.position.set(ortCamera.viewportWidth / 2f, ortCamera.viewportHeight / 2f, 0);
+            extViewport.getCamera().position.set(_windowWidth / 2f, _windowHeight / 2f, 0);
 
             customInputProcessorUI = new CustomInputProcessorUI(_isDesktop);
             _inputMultiplexer.addProcessor(customInputProcessorUI);
@@ -151,11 +152,16 @@ public final class FastDevRKCustomUILib {
     public static void resizeWindow(int _newWindowWidth, int _newWindowHeight) {
         if (isLibInit() && _newWindowWidth != 1 && _newWindowHeight != 1) {
             extViewport.update(_newWindowWidth, _newWindowHeight, true);
-            ortCamera.position.set(ortCamera.viewportWidth / 2f, ortCamera.viewportHeight / 2f, 0);
+            extViewport.getCamera().position.set(extViewport.getCamera().viewportWidth / 2f, extViewport.getCamera().viewportHeight / 2f, 0);
 
-            windowWidth  = _newWindowWidth;
-            windowHeight = _newWindowHeight;
+            windowWidth  = (int) unproject(_newWindowWidth, 0).x;
+            windowHeight = (int) unproject(_newWindowHeight, 0).x;
         }
+    }
+
+    public static Vector3 unproject(float _x, float _y) {
+        if (isLibInit()) return extViewport.getCamera().unproject(new Vector3(_x, _y, 0));
+        else return new Vector3(-1, -1, -1);
     }
 
     public static void changeCursor(int _cursorType) {
@@ -176,7 +182,10 @@ public final class FastDevRKCustomUILib {
     public static void update(float _delta) {
         if (isLibInit()) {
             extViewport.apply();
-            ortCamera.update(true);
+            extViewport.getCamera().update(true);
+
+            batch.setProjectionMatrix(extViewport.getCamera().combined);
+            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 
             if (!isAllResLoaded()) {
                 if (isShowLoadingLine) {
@@ -219,7 +228,7 @@ public final class FastDevRKCustomUILib {
 
                         // check focus (is hover and pointer down - element in focus)
                         else {
-                            if (uiElement.isPointerHover() && customInputProcessorUI.getPointersStates(false)[0][0]) {
+                            if (uiElement.isPointerHover() && customInputProcessorUI.getPointersStates(false)[0].isDown()) {
                                 for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
 
                                 uiElement.setIsInFocus(true);
@@ -228,10 +237,10 @@ public final class FastDevRKCustomUILib {
                         }
                     }
                 }
-                if (!isHasHover && customInputProcessorUI.getPointersStates(false)[0][1]) for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
+                if (!isHasHover && customInputProcessorUI.getPointersStates(false)[0].isUp()) for (IRKUIElement uiElementUnFocus : arrRKUIElements) uiElementUnFocus.setIsInFocus(false);
 
                 // update elements
-                boolean[][] pointersStates = customInputProcessorUI.getPointersStates();
+                PointersStates[] pointersStates = customInputProcessorUI.getPointersStates(); // Warning: local variable is important! Do not move into a method argument!
                 for (IRKUIElement uiElement : arrRKUIElements) {
                     if (uiElement.isVisible()) uiElement.update(_delta, pointersStates);
                 }
@@ -248,9 +257,6 @@ public final class FastDevRKCustomUILib {
                 Gdx.gl20.glClearColor(GlobalColorsDark.DARK_COLOR_BG.r, GlobalColorsDark.DARK_COLOR_BG.g, GlobalColorsDark.DARK_COLOR_BG.b, GlobalColorsDark.DARK_COLOR_BG.a);
                 Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
             }
-
-            batch.setProjectionMatrix(ortCamera.combined);
-            shapeRenderer.setProjectionMatrix(ortCamera.combined);
 
             if (isAllResLoaded && isCanShowUIElements) {
                 for (IRKUIElement uiElement : arrRKUIElements) {
@@ -319,17 +325,17 @@ public final class FastDevRKCustomUILib {
     }
 
     public static Camera getCamera() {
-        return (isLibInit() ? ortCamera : null);
+        return (isLibInit() ? extViewport.getCamera() : null);
     }
     public static OrthographicCamera getOrthographicCamera() {
-        return (isLibInit() ? ortCamera : null);
+        return (isLibInit() ? (OrthographicCamera) extViewport.getCamera() : null);
     }
 
     public static String getDefaultImageName(DefaultImages _defaultImgName) {
         return (isLibInit() ? DEFAULT_IMAGES_NAMES_PATH[ _defaultImgName.ordinal() ][0] : null);
     }
 
-    public static boolean[][] getPointersStates() {
+    public static PointersStates[] getPointersStates() {
         return (isLibInit() ? customInputProcessorUI.getPointersStates(false) : null);
     }
 

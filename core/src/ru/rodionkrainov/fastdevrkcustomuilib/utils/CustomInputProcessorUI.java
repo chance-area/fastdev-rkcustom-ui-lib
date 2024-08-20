@@ -25,11 +25,6 @@ public final class CustomInputProcessorUI implements InputProcessor {
         isDesktop = _isDesktop;
     }
 
-    public static Vector3 unproject(float _x, float _y) {
-        if (FastDevRKCustomUILib.isLibInit()) return Objects.requireNonNull(FastDevRKCustomUILib.getCamera()).unproject(new Vector3(_x, _y, 0));
-        else return new Vector3(-1, -1, -1);
-    }
-
     @Override
     public boolean keyDown(int keycode) {
         return false;
@@ -49,7 +44,7 @@ public final class CustomInputProcessorUI implements InputProcessor {
     public boolean touchDown(int _screenX, int _screenY, int _pointer, int button) {
         Gdx.input.setOnscreenKeyboardVisible(false);
 
-        Vector3 unprojectV = unproject(_screenX, _screenY);
+        Vector3 unprojectV = FastDevRKCustomUILib.unproject(_screenX, _screenY);
         vPointerDownPosition.set(unprojectV.x, unprojectV.y);
 
         vPointerUpPosition.set(-1, -1);
@@ -62,7 +57,7 @@ public final class CustomInputProcessorUI implements InputProcessor {
 
     @Override
     public boolean touchUp(int _screenX, int _screenY, int _pointer, int button) {
-        Vector3 unprojectV = unproject(_screenX, _screenY);
+        Vector3 unprojectV = FastDevRKCustomUILib.unproject(_screenX, _screenY);
         vPointerUpPosition.set(unprojectV.x, unprojectV.y);
 
         if (isDesktop) vPointerDownPosition.set(-1, -1);
@@ -81,7 +76,7 @@ public final class CustomInputProcessorUI implements InputProcessor {
 
     @Override
     public boolean touchDragged(int _screenX, int _screenY, int _pointer) {
-        Vector3 unprojectV = unproject(_screenX, _screenY);
+        Vector3 unprojectV = FastDevRKCustomUILib.unproject(_screenX, _screenY);
         vPointerDraggedPosition.set(unprojectV.x, unprojectV.y);
 
         vPointerUpPosition.set(-1, -1);
@@ -94,7 +89,7 @@ public final class CustomInputProcessorUI implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int _screenX, int _screenY) {
-        Vector3 unprojectV = unproject(_screenX, _screenY);
+        Vector3 unprojectV = FastDevRKCustomUILib.unproject(_screenX, _screenY);
         if (isDesktop && vPointerDraggedPosition.x == -1 && vPointerDraggedPosition.y == -1) vPointerMovePosition.set(unprojectV.x, unprojectV.y);
         return false;
     }
@@ -125,15 +120,21 @@ public final class CustomInputProcessorUI implements InputProcessor {
         return vPointerMovePosition;
     }
 
-    public boolean[][] getPointersStates(boolean _isReset) {
-        boolean[][] tpmStates = new boolean[ pointersStates.length ][ pointersStates[0].length ];
-        for (int i = 0; i < tpmStates.length; i++) System.arraycopy(pointersStates[i], 0, tpmStates[i], 0, tpmStates[i].length);
+    public PointersStates[] getPointersStates(boolean _isReset) {
+        PointersStates[] objPointersStates = new PointersStates[ pointersStates.length ];
+        for (int i = 0; i < objPointersStates.length; i++) {
+            boolean isDown    = pointersStates[i][0];
+            boolean isUp      = pointersStates[i][1];
+            boolean isDragged = pointersStates[i][2];
 
-        if (_isReset) resetPointersStates();
+            objPointersStates[i] = new PointersStates(isDown, isUp, isDragged);
+        }
 
-        return tpmStates;
+        if (_isReset) for (boolean[] pointerState : pointersStates) Arrays.fill(pointerState, false);
+
+        return objPointersStates;
     }
-    public boolean[][] getPointersStates() {
+    public PointersStates[] getPointersStates() {
         return getPointersStates(true);
     }
 
@@ -152,9 +153,5 @@ public final class CustomInputProcessorUI implements InputProcessor {
                 vPointerDownPosition.set(-1, -1);
             } else numIterationsToResetDownVPos--;
         }
-    }
-
-    public void resetPointersStates() {
-        for (boolean[] pointerState : pointersStates) Arrays.fill(pointerState, false);
     }
 }

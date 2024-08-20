@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import ru.rodionkrainov.fastdevrkcustomuilib.GlobalFontsManager;
 import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public class RKLabel extends RKCustomElement {
     private boolean isImage;
@@ -54,7 +55,7 @@ public class RKLabel extends RKCustomElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             setFillColor(fontColor);
 

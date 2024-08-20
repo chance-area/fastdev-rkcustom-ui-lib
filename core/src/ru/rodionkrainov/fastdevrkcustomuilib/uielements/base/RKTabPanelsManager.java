@@ -15,6 +15,7 @@ import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.IRKUIElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public class RKTabPanelsManager extends RKCustomElement {
     private float tabHeight;
@@ -107,7 +108,7 @@ public class RKTabPanelsManager extends RKCustomElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             setIsInFocus(true);
 
@@ -135,9 +136,13 @@ public class RKTabPanelsManager extends RKCustomElement {
                     FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
                     rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TAB_HOVER);
 
-                    if (_pointersStates[0][1]) {
-                        setSelectedTab(arrTabs.get(i).get(0));
-                        isSelectTabClick = true;
+                    for (PointersStates pointerStates : _pointersStates) {
+                        if (pointerStates.isUp()) {
+                            setSelectedTab(arrTabs.get(i).get(0));
+                            isSelectTabClick = true;
+
+                            break;
+                        }
                     }
                 } else {
                     rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TABS);
@@ -177,7 +182,6 @@ public class RKTabPanelsManager extends RKCustomElement {
     public void draw(Batch _batch, ShapeRenderer _shapeRenderer) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             if (!arrTabs.isEmpty()) {
-                _shapeRenderer.setProjectionMatrix(_batch.getProjectionMatrix());
                 _batch.end();
                 _shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                 DrawingTools.enableGLBlend();

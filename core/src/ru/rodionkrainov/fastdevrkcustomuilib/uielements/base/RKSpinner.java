@@ -11,6 +11,7 @@ import ru.rodionkrainov.fastdevrkcustomuilib.FastDevRKCustomUILib;
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.MathPlus;
+import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 
 public class RKSpinner extends RKCustomElement {
     private Color fontColor;
@@ -56,7 +57,7 @@ public class RKSpinner extends RKCustomElement {
     }
 
     @Override
-    public void update(float _delta, boolean[][] _pointersStates) {
+    public void update(float _delta, PointersStates[] _pointersStates) {
         if (isVisible() && getAlpha() > 0 && getLocalAlpha() > 0) {
             setIsInFocus(spinnerLabel.isInFocus() || spinnerRect.isInFocus());
 
@@ -89,10 +90,10 @@ public class RKSpinner extends RKCustomElement {
 
                 if (arrowRectUp.isPointerHover()) {
                     arrowImageUp.setAlpha(1f);
-                    if (_pointersStates[0][1]) value += step;
+                    if (_pointersStates[0].isUp()) value += step;
                 }else if (arrowRectDown.isPointerHover()) {
                     arrowImageDown.setAlpha(1f);
-                    if (_pointersStates[0][1]) value -= step;
+                    if (_pointersStates[0].isUp()) value -= step;
                 }
 
                 value = Math.max(Math.min(MathPlus.roundTo(value, 4), maxValue), minValue);
