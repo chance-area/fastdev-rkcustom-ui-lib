@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 
 import javax.swing.JFrame;
 
@@ -99,8 +98,8 @@ public class TestsUIElements extends ApplicationAdapter {
         radioBox = FastDevRKCustomUILib.addRadioBox("simple_radioBox", new String[]{"USB (Serial Port)", "Wi-Fi"}, GlobalColorsDark.DARK_COLOR_WHITE, 27, 620, 400, 3);
 
         // init and add tab panels managers
-        tabPanelsManagerOne = FastDevRKCustomUILib.addTabPanelsManager("tab_panels_manager_1", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_1, 1);
-        tabPanelsManagerTwo = FastDevRKCustomUILib.addTabPanelsManager("tab_panels_manager_2", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_PANEL_2, 2);
+        tabPanelsManagerOne = FastDevRKCustomUILib.addTabPanelsManager("tab_panels_manager_1", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_BG_PANEL_1, 1);
+        tabPanelsManagerTwo = FastDevRKCustomUILib.addTabPanelsManager("tab_panels_manager_2", (isDesktop ? 31 : 46), GlobalColorsDark.DARK_COLOR_TABBED_BG_PANEL_2, 2);
 
         // tab panel 1 (main)
         tabPanelsManagerOne.addTab("base_elements", "Базовые элементы");

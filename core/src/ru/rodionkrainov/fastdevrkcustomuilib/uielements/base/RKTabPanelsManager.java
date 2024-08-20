@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 
 import java.awt.Cursor;
 import java.util.ArrayList;
@@ -22,10 +21,10 @@ public class RKTabPanelsManager extends RKCustomElement {
     private float tabsWidthSum;
 
     private final int LABEL_FONT_SIZE;
-    private final float SPACE_BETWEEN_TABS     = 0.75f;
+    private final float SPACE_BETWEEN_TABS     = 0.65f;
     private final float TABS_TITLES_PADDING_LR = 22f; // Left and Right
     private final float TABS_TITLES_PADDING_UB = 8f; // Up and Bottom
-    private final float LINE_HEIGHT            = 1.5f;
+    private final float LINE_HEIGHT            = 1.5f; // under all tabs
     private final float LINE_HEIGHT_KOF        = 3f; // for selected tab
 
     // for animations
@@ -55,8 +54,8 @@ public class RKTabPanelsManager extends RKCustomElement {
         String labelName = "tabManager_" + getName() + "_tab_" + "-" + _tabName + "_tabLabel_" + arrTabs.size();
         String rectName  = "tabManager_" + getName() + "_tab_" + "-" + _tabName + "_tabRect_" + arrTabs.size();
 
-        arrLabels.add(FastDevRKCustomUILib.addLabel(labelName, _tabTitle, GlobalColorsDark.DARK_COLOR_TABBED_TEXT, LABEL_FONT_SIZE, getZIndex(), (getLocalZIndex() - 1)));
-        arrRects.add(FastDevRKCustomUILib.addRect(rectName, -1, -1, 0, 0, GlobalColorsDark.DARK_COLOR_TABS, getZIndex(), (getLocalZIndex() - 2)));
+        arrLabels.add(FastDevRKCustomUILib.addLabel(labelName, _tabTitle, GlobalColorsDark.DARK_COLOR_TABS_TITLE_TEXT, LABEL_FONT_SIZE, getZIndex(), (getLocalZIndex() - 1)));
+        arrRects.add(FastDevRKCustomUILib.addRect(rectName, -1, -1, 0, 0, GlobalColorsDark.DARK_COLOR_TABS_TITLE_RECT, getZIndex(), (getLocalZIndex() - 2)));
 
         arrLabels.get( (arrLabels.size() - 1) ).setVisible(isVisible());
         arrRects.get( (arrRects.size() - 1) ).setVisible(isVisible());
@@ -93,10 +92,12 @@ public class RKTabPanelsManager extends RKCustomElement {
     }
 
     public void setSelectedTab(String _tabName) {
-        previousSelectedTabName = selectedTabName;
+        if (!_tabName.equals(selectedTabName)) {
+            previousSelectedTabName = selectedTabName;
 
-        selectedTabName = _tabName;
-        isSelectedTabChanged = true;
+            selectedTabName = _tabName;
+            isSelectedTabChanged = true;
+        }
     }
 
     public String getSelectedTabName() {
@@ -134,7 +135,8 @@ public class RKTabPanelsManager extends RKCustomElement {
                 // hover and click events
                 if (rkLabel.isPointerHover() || rkRect.isPointerHover()) {
                     FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
-                    rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TAB_HOVER);
+                    rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_RECT_HOVER);
+                    rkLabel.setFontColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_TEXT_HOVER);
 
                     for (PointersStates pointerStates : _pointersStates) {
                         if (pointerStates.isUp()) {
@@ -145,7 +147,8 @@ public class RKTabPanelsManager extends RKCustomElement {
                         }
                     }
                 } else {
-                    rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TABS);
+                    rkRect.setFillColor((arrTabs.get(i).get(0).equals(selectedTabName) ? GlobalColorsDark.DARK_COLOR_TAB_SELECTED_TITLE_RECT : GlobalColorsDark.DARK_COLOR_TABS_TITLE_RECT));
+                    rkLabel.setFontColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_TEXT);
                 }
             }
             tabsWidthSum = sumWidthLeft;
@@ -191,7 +194,7 @@ public class RKTabPanelsManager extends RKCustomElement {
                 _shapeRenderer.rect(getX(), getY(), getWidth(), getHeight());
 
                 // draw line
-                _shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_TAB_LINE.r, GlobalColorsDark.DARK_COLOR_TAB_LINE.g, GlobalColorsDark.DARK_COLOR_TAB_LINE.b, Math.min(getAlpha(), getLocalAlpha()));
+                _shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_UNDER_ALL_TABS_LINE.r, GlobalColorsDark.DARK_COLOR_UNDER_ALL_TABS_LINE.g, GlobalColorsDark.DARK_COLOR_UNDER_ALL_TABS_LINE.b, Math.min(getAlpha(), getLocalAlpha()));
                 _shapeRenderer.rect(getX(), getY() + getHeight(), getWidth(), LINE_HEIGHT);
 
                 // draw selected tab line

@@ -335,6 +335,9 @@ public final class FastDevRKCustomUILib {
         return (isLibInit() ? DEFAULT_IMAGES_NAMES_PATH[ _defaultImgName.ordinal() ][0] : null);
     }
 
+    public static PointersStates[] getPointersStates(boolean _isReset) {
+        return (isLibInit() ? customInputProcessorUI.getPointersStates(_isReset) : null);
+    }
     public static PointersStates[] getPointersStates() {
         return (isLibInit() ? customInputProcessorUI.getPointersStates(false) : null);
     }

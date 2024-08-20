@@ -17,7 +17,7 @@ import ru.rodionkrainov.fastdevrkcustomuilib.utils.PointersStates;
 public class RKRadioBox extends RKCustomElement {
     private Color fontColor;
 
-    private float MARGIN_POINT_LABEL = 11f;
+    private float MARGIN_POINT_LABEL = 14f;
     private float MARGIN_ELEMENTS    = 115f;
 
     private final ArrayList<RKRect>  arrRects  = new ArrayList<>();
@@ -49,17 +49,24 @@ public class RKRadioBox extends RKCustomElement {
 
                 rect.setZIndex(getZIndex());
                 label.setZIndex(getZIndex());
-                rect.setAlpha(0.01f);
+                rect.setAlpha(0.001f);
                 label.setAlpha(getAlpha());
 
-                float basePosX = i * (i > 0 ? (arrRects.get( (i - 1) ).getWidth() + arrLabels.get( (i - 1) ).getWidth() + MARGIN_POINT_LABEL) + MARGIN_ELEMENTS : 0);
+                rect.setSize(label.getFontSize() + MARGIN_POINT_LABEL, label.getFontSize());
+
+                float basePosX = i * (i > 0 ? ((arrRects.get( (i - 1) ).getWidth() + arrLabels.get( (i - 1) ).getWidth()) + MARGIN_ELEMENTS) : 0);
                 rect.setPosition(getX() + basePosX, getY());
-                label.setPosition(getX() + arrRects.get(i).getWidth() + basePosX + MARGIN_POINT_LABEL, getY());
+                label.setPosition(getX() + arrRects.get(i).getWidth() + basePosX, getY());
 
                 if (rect.isPointerHover() || label.isPointerHover()) {
                     FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
 
-                    if (_pointersStates[0].isUp()) selectedElementIndex = i;
+                    for (PointersStates pointerStates : _pointersStates) {
+                        if (pointerStates.isUp()) {
+                            selectedElementIndex = i;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -84,7 +91,7 @@ public class RKRadioBox extends RKCustomElement {
                     _shapeRenderer.end();
                     _shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                     _shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_RADIO_BUTTON_POINT.r, GlobalColorsDark.DARK_COLOR_RADIO_BUTTON_POINT.g, GlobalColorsDark.DARK_COLOR_RADIO_BUTTON_POINT.b, pointsAlpha);
-                    _shapeRenderer.circle(rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f, rect.getHeight() / 4.5f, circleSegments);
+                    _shapeRenderer.circle(rect.getX() + rect.getWidth() / 2f - MARGIN_POINT_LABEL / 2f, rect.getY() + rect.getHeight() / 2f, rect.getHeight() / 4.5f, circleSegments);
                     _shapeRenderer.end();
                     _shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                     _shapeRenderer.setColor(GlobalColorsDark.DARK_COLOR_RADIO_BUTTON_SELECTED.r, GlobalColorsDark.DARK_COLOR_RADIO_BUTTON_SELECTED.g, GlobalColorsDark.DARK_COLOR_RADIO_BUTTON_SELECTED.b, pointsAlpha);
@@ -93,7 +100,7 @@ public class RKRadioBox extends RKCustomElement {
                 }
 
                 // draw main (big) circle (empty point)
-                _shapeRenderer.circle(rect.getX() + rect.getWidth() / 2f, rect.getY() + rect.getHeight() / 2f, rect.getHeight() / 2f - 1f, circleSegments);
+                _shapeRenderer.circle(rect.getX() + rect.getWidth() / 2f - MARGIN_POINT_LABEL / 2f, rect.getY() + rect.getHeight() / 2f, rect.getHeight() / 2f - 1f, circleSegments);
             }
 
             _shapeRenderer.end();

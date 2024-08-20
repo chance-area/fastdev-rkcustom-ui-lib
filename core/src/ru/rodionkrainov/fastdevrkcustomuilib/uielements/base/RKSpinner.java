@@ -88,12 +88,20 @@ public class RKSpinner extends RKCustomElement {
             if (spinnerRect.isPointerHover() || spinnerLabel.isPointerHover() || arrowRectUp.isPointerHover() || arrowRectDown.isPointerHover()) {
                 FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
 
-                if (arrowRectUp.isPointerHover()) {
-                    arrowImageUp.setAlpha(1f);
-                    if (_pointersStates[0].isUp()) value += step;
-                }else if (arrowRectDown.isPointerHover()) {
-                    arrowImageDown.setAlpha(1f);
-                    if (_pointersStates[0].isUp()) value -= step;
+                for (PointersStates pointerStates : _pointersStates) {
+                    if (arrowRectUp.isPointerHover()) {
+                        arrowImageUp.setAlpha(1f);
+                        if (pointerStates.isUp()) {
+                            value += step;
+                            break;
+                        }
+                    } else if (arrowRectDown.isPointerHover()) {
+                        arrowImageDown.setAlpha(1f);
+                        if (pointerStates.isUp()) {
+                            value -= step;
+                            break;
+                        }
+                    }
                 }
 
                 value = Math.max(Math.min(MathPlus.roundTo(value, 4), maxValue), minValue);

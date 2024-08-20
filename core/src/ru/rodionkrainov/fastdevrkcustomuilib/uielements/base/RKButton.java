@@ -54,7 +54,10 @@ public class RKButton extends RKCustomElement {
                 setBorderColor(GlobalColorsDark.DARK_COLOR_BUTTON_HOVER_BORDER);
 
                 if (Gdx.input.isTouched()) setFillColor(GlobalColorsDark.DARK_COLOR_BUTTON_TOUCHED);
-                if (_pointersStates[0].isUp()) onButtonClickEvent.onButtonClick(this);
+                for (PointersStates pointerStates : _pointersStates) {
+                    if (pointerStates.isUp()) onButtonClickEvent.onButtonClick(this);
+                    break;
+                }
             } else {
                 setFillColor(GlobalColorsDark.DARK_COLOR_BUTTON);
                 setBorderColor(GlobalColorsDark.DARK_COLOR_BUTTON_BORDER);

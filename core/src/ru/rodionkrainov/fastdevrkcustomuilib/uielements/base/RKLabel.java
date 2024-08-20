@@ -101,6 +101,10 @@ public class RKLabel extends RKCustomElement {
         return label.getText().toString();
     }
 
+    public float getFontSize() {
+        return fontSize;
+    }
+
     @Override
     public void dispose() {
         label.remove();

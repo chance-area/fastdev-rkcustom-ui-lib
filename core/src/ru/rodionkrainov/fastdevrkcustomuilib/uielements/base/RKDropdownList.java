@@ -129,7 +129,14 @@ public class RKDropdownList extends RKCustomElement {
                 elementLabel.setFontColor(fontColor);
                 elementLabel.setPosition(elementRect.getX() + (elementRect.getWidth() - elementLabel.getWidth()) / 2f, elementRect.getY() + (elementRect.getHeight() - elementLabel.getHeight()) / 2f);
 
-                if ((elementRect.isPointerHover() || elementLabel.isPointerHover()) && _pointersStates[0].isDown()) selectedElementText = elementLabel.getText();
+                if (elementRect.isPointerHover() || elementLabel.isPointerHover()) {
+                    for (PointersStates pointerStates : _pointersStates) {
+                        if (pointerStates.isDown()) {
+                            selectedElementText = elementLabel.getText();
+                            break;
+                        }
+                    }
+                }
             }
 
             titleLabel.setText(selectedElementText);
