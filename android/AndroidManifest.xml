@@ -19,7 +19,7 @@
         <activity
             android:name="ru.rodionkrainov.fastdevrkcustomuilib.AndroidLauncher"
             android:screenOrientation="userLandscape"
-            tools:ignore="LockedOrientationActivity"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout"
             android:exported="true">
             <intent-filter>
