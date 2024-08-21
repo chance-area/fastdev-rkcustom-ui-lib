@@ -123,7 +123,7 @@ public class RKDropdownList extends RKCustomElement {
 
                 elementRect.setSize(getWidth(), getHeight());
                 elementRect.setPosition(getX(), getY() - (i + 1) * getHeight());
-                elementRect.setFillColor(((elementRect.isPointerHover() || elementLabel.isPointerHover()) ? GlobalColorsDark.DARK_COLOR_BUTTON_HOVER : getFillColor()));
+                elementRect.setFillColor(((elementRect.isPointerHover() || elementLabel.isPointerHover()) ? GlobalColorsDark.DARK_COLOR_DROPDOWN_BOX_HOVER : getFillColor()));
                 elementRect.setBorderColor(getBorderColor());
 
                 elementLabel.setFontColor(fontColor);

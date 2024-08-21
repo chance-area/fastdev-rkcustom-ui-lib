@@ -87,12 +87,12 @@ public class TestsUIElements extends ApplicationAdapter {
         buttonOne.setAlpha(0.6f);
         buttonTwo.setAlpha(1f);
 
-        spinnerOne = FastDevRKCustomUILib.addSpinner("simple_spinner_1", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 400, 320, 52, 2f, 6f, 3);
-        spinnerTwo = FastDevRKCustomUILib.addSpinner("simple_spinner_2", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 300, 320, 52, 2f, 6f, 3);
+        spinnerOne = FastDevRKCustomUILib.addSpinner("simple_spinner_1", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 400, 320, 52, 0f, 6f, 3);
+        spinnerTwo = FastDevRKCustomUILib.addSpinner("simple_spinner_2", 0f, 0f, 4f, 0.02f, GlobalColorsDark.DARK_COLOR_WHITE, 27, 100, 300, 320, 52, 0f, 6f, 3);
 
-        dropdownListOne = FastDevRKCustomUILib.addDropdownList("dropdown_list_1", GlobalColorsDark.DARK_COLOR_WHITE, 27, 600, 200, 240, 52, 2f, 6f, 3);
-        dropdownListOne.setElementsList(new String[]{"Элемент 1", "Элемент 2"});
-        dropdownListTwo = FastDevRKCustomUILib.addDropdownList("dropdown_list_2", GlobalColorsDark.DARK_COLOR_WHITE, 27, 600, 100, 240, 52, 2f, 6f, 3);
+        dropdownListOne = FastDevRKCustomUILib.addDropdownList("dropdown_list_1", GlobalColorsDark.DARK_COLOR_WHITE, 27, 600, 200, 240, 52, 0f, 6f, 3);
+        dropdownListOne.setElementsList(new String[]{"Элемент 1", "Элемент 2", "Элемент 3"});
+        dropdownListTwo = FastDevRKCustomUILib.addDropdownList("dropdown_list_2", GlobalColorsDark.DARK_COLOR_WHITE, 27, 600, 100, 240, 52, 0f, 6f, 3);
         //dropdownListTwo.setElementsList(new String[]{"Элемент 1", "Элемент 2"});
 
         radioBox = FastDevRKCustomUILib.addRadioBox("simple_radioBox", new String[]{"USB (Serial Port)", "Wi-Fi"}, GlobalColorsDark.DARK_COLOR_WHITE, 27, 620, 400, 3);

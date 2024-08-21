@@ -132,23 +132,32 @@ public class RKTabPanelsManager extends RKCustomElement {
                 if (arrTabs.get(i).get(2).equals("left")) sumWidthLeft += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
                 else sumWidthRight += tabRectWidth + (i > 0 ? SPACE_BETWEEN_TABS : 0);
 
+                boolean isRectSelected = arrTabs.get(i).get(0).equals(selectedTabName);
+
                 // hover and click events
                 if (rkLabel.isPointerHover() || rkRect.isPointerHover()) {
                     FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
-                    rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_RECT_HOVER);
-                    rkLabel.setFontColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_TEXT_HOVER);
+                    if (!isRectSelected) {
+                        //FastDevRKCustomUILib.changeCursor(Cursor.HAND_CURSOR);
 
-                    for (PointersStates pointerStates : _pointersStates) {
-                        if (pointerStates.isUp()) {
-                            setSelectedTab(arrTabs.get(i).get(0));
-                            isSelectTabClick = true;
+                        rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_RECT_HOVER);
+                        rkLabel.setFontColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_TEXT_HOVER);
 
-                            break;
+                        for (PointersStates pointerStates : _pointersStates) {
+                            if (pointerStates.isUp()) {
+                                setSelectedTab(arrTabs.get(i).get(0));
+                                isSelectTabClick = true;
+
+                                rkRect.setFillColor(GlobalColorsDark.DARK_COLOR_TAB_SELECTED_TITLE_RECT);
+                                rkLabel.setFontColor(GlobalColorsDark.DARK_COLOR_TAB_SELECTED_TITLE_TEXT);
+
+                                break;
+                            }
                         }
                     }
                 } else {
-                    rkRect.setFillColor((arrTabs.get(i).get(0).equals(selectedTabName) ? GlobalColorsDark.DARK_COLOR_TAB_SELECTED_TITLE_RECT : GlobalColorsDark.DARK_COLOR_TABS_TITLE_RECT));
-                    rkLabel.setFontColor(GlobalColorsDark.DARK_COLOR_TABS_TITLE_TEXT);
+                    rkRect.setFillColor((isRectSelected ? GlobalColorsDark.DARK_COLOR_TAB_SELECTED_TITLE_RECT : GlobalColorsDark.DARK_COLOR_TABS_TITLE_RECT));
+                    rkLabel.setFontColor((isRectSelected ? GlobalColorsDark.DARK_COLOR_TAB_SELECTED_TITLE_TEXT : GlobalColorsDark.DARK_COLOR_TABS_TITLE_TEXT));
                 }
             }
             tabsWidthSum = sumWidthLeft;

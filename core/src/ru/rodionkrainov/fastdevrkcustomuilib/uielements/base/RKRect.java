@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 import ru.rodionkrainov.fastdevrkcustomuilib.uielements.RKCustomElement;
 import ru.rodionkrainov.fastdevrkcustomuilib.utils.DrawingTools;
@@ -54,6 +55,10 @@ public class RKRect extends RKCustomElement {
 
             float borderSize = getBorderSize();
 
+            /*float shadowOffsetX = 1.5f;
+            float shadowOffsetY = -1.5f;
+            Color shadowColor = new Color(0f, 0f, 0f, getAlpha() * 0.1f);*/
+
             _shapeRenderer.setColor(getFillColor());
             if (!isRoundRadiusTopLeft && !isRoundRadiusTopRight && !isRoundRadiusBottomLeft && !isRoundRadiusBottomRight) {
                 if (borderSize > 0 && getBorderColor() != null) {
@@ -76,9 +81,14 @@ public class RKRect extends RKCustomElement {
                     _shapeRenderer.setColor(getBorderColor());
                     drawRoundedRect(_shapeRenderer, posX, posY, width, height, roundRadius);
 
-                    _shapeRenderer.setColor(getFillColor());
-                    if (isBorderDown && isBorderUp) drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize * 2, (roundRadius - borderSize));
-                    else if (isBorderDown)          drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize, (roundRadius - borderSize));
+                    if (isBorderDown && isBorderUp) {
+                        //drawRoundedShadow(_shapeRenderer, posX - borderSize + shadowOffsetX, posY - borderSize + shadowOffsetY, width + borderSize * 2f, height + borderSize * 2f, roundRadius, roundRadius, shadowColor);
+
+                        _shapeRenderer.setColor(getFillColor());
+                        drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize * 2, (roundRadius - borderSize));
+                    } else if (isBorderDown) {
+                        drawRoundedRect(_shapeRenderer, posX + borderSize, posY + borderSize, width - borderSize * 2, height - borderSize, (roundRadius - borderSize));
+                    }
                     else if (isBorderUp)            drawRoundedRect(_shapeRenderer, posX + borderSize, posY, width - borderSize * 2, height - borderSize, (roundRadius - borderSize));
                     else                            drawRoundedRect(_shapeRenderer, posX + borderSize, posY, width - borderSize * 2, height, (roundRadius - borderSize));
                 } else {
@@ -116,6 +126,22 @@ public class RKRect extends RKCustomElement {
             _shapeRenderer.rect(_posX + _width - _radius, _posY + _radius, _radius, _height - _radius * 2f);
             _shapeRenderer.arc(_posX + _width - _radius, _posY + _radius, _radius, 270f, 90f, arcSegments);
         } else _shapeRenderer.rect(_posX + _width - _radius, _posY, _radius, _height - _radius);
+    }
+
+    private void drawRoundedShadow(ShapeRenderer _shapeRenderer, float _x, float _y, float _width, float _height, float _radius, float _shadowRadius, Color shadowColor) {
+        /*for (int i = 1; i <= _numSegments; i++) {
+            float alpha = shadowColor.a * ((float) i / _numSegments);
+            float currentWeight = _weight * ((float) i / _numSegments);
+
+            _shapeRenderer.setColor(shadowColor.r, shadowColor.g, shadowColor.b, alpha);
+            drawRoundedRect(_shapeRenderer, _x - currentWeight, _y - currentWeight, _width + currentWeight * 2f, _height + currentWeight * 2f, _radius + currentWeight);
+        }*/
+        for (int i = 0; i < _shadowRadius; i++) {
+            float alpha = shadowColor.a * (1 - (float) i / _shadowRadius);
+            _shapeRenderer.setColor(shadowColor.r, shadowColor.g, shadowColor.b, alpha);
+
+            drawRoundedRect(_shapeRenderer, _x - i, _y - i, _width + 2 * i, _height + 2 * i, _radius + i);
+        }
     }
 
     public void setIsRoundRadiusTopLeft(boolean _isRoundRadiusTopLeft) {
